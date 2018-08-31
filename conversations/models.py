@@ -25,21 +25,29 @@ class Conversation(db.Model, CRUDMixin):
     __tablename__ = "conversations"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer,
-                        db.ForeignKey("users.id", ondelete="CASCADE"),
-                        nullable=False)
-    from_user_id = db.Column(db.Integer, db.ForeignKey("users.id",
-                                                       ondelete="SET NULL"),
-                             nullable=True)
-    to_user_id = db.Column(db.Integer, db.ForeignKey("users.id",
-                                                     ondelete="SET NULL"),
-                           nullable=True)
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    from_user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    to_user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     shared_id = db.Column(UUIDType, nullable=False)
     subject = db.Column(db.String(255), nullable=True)
-    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
-                             nullable=False)
-    date_modified = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
-                              nullable=False)
+    date_created = db.Column(
+        UTCDateTime(timezone=True), default=time_utcnow, nullable=False
+    )
+    date_modified = db.Column(
+        UTCDateTime(timezone=True), default=time_utcnow, nullable=False
+    )
     trash = db.Column(db.Boolean, default=False, nullable=False)
     draft = db.Column(db.Boolean, default=False, nullable=False)
     unread = db.Column(db.Boolean, default=False, nullable=False)
@@ -50,7 +58,7 @@ class Conversation(db.Model, CRUDMixin):
         backref="conversation",
         primaryjoin="Message.conversation_id == Conversation.id",
         order_by="asc(Message.id)",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
     )
 
     # this is actually the users message box
@@ -58,21 +66,15 @@ class Conversation(db.Model, CRUDMixin):
         "User",
         lazy="joined",
         backref=db.backref("conversations", lazy="dynamic"),
-        foreign_keys=[user_id]
+        foreign_keys=[user_id],
     )
 
     # the user to whom the conversation is addressed
-    to_user = db.relationship(
-        "User",
-        lazy="joined",
-        foreign_keys=[to_user_id]
-    )
+    to_user = db.relationship("User", lazy="joined", foreign_keys=[to_user_id])
 
     # the user who sent the message
     from_user = db.relationship(
-        "User",
-        lazy="joined",
-        foreign_keys=[from_user_id]
+        "User", lazy="joined", foreign_keys=[from_user_id]
     )
 
     @property
@@ -111,18 +113,22 @@ class Message(db.Model, CRUDMixin):
     __tablename__ = "messages"
 
     id = db.Column(db.Integer, primary_key=True)
-    conversation_id = db.Column(db.Integer,
-                                db.ForeignKey("conversations.id",
-                                              ondelete="CASCADE"),
-                                nullable=False)
+    conversation_id = db.Column(
+        db.Integer,
+        db.ForeignKey("conversations.id", ondelete="CASCADE"),
+        nullable=False,
+    )
 
     # the user who wrote the message
-    user_id = db.Column(db.Integer,
-                        db.ForeignKey("users.id", ondelete="SET NULL"),
-                        nullable=True)
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     message = db.Column(db.Text, nullable=False)
-    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
-                             nullable=False)
+    date_created = db.Column(
+        UTCDateTime(timezone=True), default=time_utcnow, nullable=False
+    )
 
     user = db.relationship("User", lazy="joined")
 

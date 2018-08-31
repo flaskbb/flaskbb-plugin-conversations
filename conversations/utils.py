@@ -24,8 +24,7 @@ def get_unread_count(user):
     :param user: The user object.
     """
     return Conversation.query.filter(
-        Conversation.unread,
-        Conversation.user_id == user.id
+        Conversation.unread, Conversation.user_id == user.id
     ).count()
 
 
@@ -37,7 +36,7 @@ def get_message_count(user):
     """
     return Conversation.query.filter(
         Conversation.user_id == user.id,
-        Conversation.id == Message.conversation_id
+        Conversation.id == Message.conversation_id,
     ).count()
 
 
@@ -47,14 +46,14 @@ def get_latest_messages(user):
 
     :param user: The user object.
     """
-    return Conversation.query.filter(
-        Conversation.unread,
-        Conversation.user_id == user.id
-    ).order_by(
-        Conversation.id.desc()
-    ).limit(
-        MAX_LATEST_CONVERSATIONS
-    ).all()
+    return (
+        Conversation.query.filter(
+            Conversation.unread, Conversation.user_id == user.id
+        )
+        .order_by(Conversation.id.desc())
+        .limit(MAX_LATEST_CONVERSATIONS)
+        .all()
+    )
 
 
 def invalidate_cache(user):

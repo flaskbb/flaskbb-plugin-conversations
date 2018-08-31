@@ -42,22 +42,17 @@ def flaskbb_tpl_user_nav_loggedin_before():
     return render_template(
         "_inject_navlink.html",
         unread_messages=get_latest_messages(real(current_user)),
-        unread_count=get_unread_count(real(current_user))
+        unread_count=get_unread_count(real(current_user)),
     )
 
 
 @hookimpl(trylast=True)
 def flaskbb_tpl_profile_sidebar_stats(user):
-    return render_template(
-        "_inject_new_message_button.html",
-        user=user
-    )
+    return render_template("_inject_new_message_button.html", user=user)
 
 
 @hookimpl(trylast=True)
 def flaskbb_tpl_post_author_info_after(user, post):
     return render_template(
-        "_inject_new_message_link.html",
-        user=user,
-        post=post
+        "_inject_new_message_link.html", user=user, post=post
     )

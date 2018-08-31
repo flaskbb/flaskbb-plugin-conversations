@@ -25,31 +25,29 @@ setup(
     name="flaskbb-plugin-conversations",
     version=version,
     url="https://flaskbb.org",
+    project_urls={
+        "Code": "https://github.com/flaskbb/flaskbb-plugin-conversations",
+        "Issue Tracker": "https://github.com/flaskbb/flaskbb-plugin-conversations/issues",
+    },
     license="BSD License",
     author="Peter Justin",
     author_email="peter.justin@outlook.com",
-    description="Private messaging for FlaskBB",
+    description="A private messaging plugin for FlaskBB",
     long_description=__doc__,
     keywords="flaskbb plugin conversations messaging",
     packages=find_packages("."),
     include_package_data=True,
     package_data={
-        "": ["conversations/translations/*/*/*.mo",
-             "conversations/translations/*/*/*.po"]
+        "": [
+            "conversations/translations/*/*/*.mo",
+            "conversations/translations/*/*/*.po",
+        ]
     },
     zip_safe=False,
     platforms="any",
-    entry_points={
-        "flaskbb_plugins": [
-            "conversations = conversations"
-        ]
-    },
-    install_requires=[
-        "FlaskBB>=2.0.dev0"
-    ],
-    setup_requires=[
-        "Babel",
-    ],
+    entry_points={"flaskbb_plugins": ["conversations = conversations"]},
+    install_requires=["FlaskBB>=2.0.dev0"],
+    setup_requires=["Babel"],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
@@ -61,6 +59,6 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-        "Topic :: Software Development :: Libraries :: Python Modules"
+        "Topic :: Software Development :: Libraries :: Python Modules",
     ],
 )

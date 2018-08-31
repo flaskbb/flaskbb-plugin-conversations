@@ -13,7 +13,7 @@ def conversation(database, user, admin_user):
         user_id=user.id,
         from_user_id=user.id,
         to_user_id=admin_user.id,
-        shared_id=uuid.uuid4()
+        shared_id=uuid.uuid4(),
     )
     conversation.save()
     return conversation
@@ -24,13 +24,13 @@ def conversation_msgs(conversation, user, admin_user):
     message = Message(
         user_id=user.id,
         conversation_id=conversation.id,
-        message="First message"
+        message="First message",
     )
     conversation.save(message=message)
     message = Message(
         user_id=admin_user.id,
         conversation_id=conversation.id,
-        message="Second message"
+        message="Second message",
     )
     conversation.save(message=message)
     return conversation

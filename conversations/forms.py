@@ -26,14 +26,20 @@ logger = logging.getLogger(__name__)
 
 
 class ConversationForm(FlaskForm):
-    to_user = StringField(_("Recipient"), validators=[
-        DataRequired(message=_("A valid username is required."))])
+    to_user = StringField(
+        _("Recipient"),
+        validators=[DataRequired(message=_("A valid username is required."))],
+    )
 
-    subject = StringField(_("Subject"), validators=[
-        DataRequired(message=_("A Subject is required."))])
+    subject = StringField(
+        _("Subject"),
+        validators=[DataRequired(message=_("A Subject is required."))],
+    )
 
-    message = TextAreaField(_("Message"), validators=[
-        DataRequired(message=_("A message is required."))])
+    message = TextAreaField(
+        _("Message"),
+        validators=[DataRequired(message=_("A message is required."))],
+    )
 
     send_message = SubmitField(_("Start Conversation"))
     save_message = SubmitField(_("Save Conversation"))
@@ -41,13 +47,21 @@ class ConversationForm(FlaskForm):
     def validate_to_user(self, field):
         user = User.query.filter_by(username=field.data).first()
         if not user:
-            raise ValidationError(_("The username you entered does not "
-                                    "exist."))
+            raise ValidationError(
+                _("The username you entered does not " "exist.")
+            )
         if user.id == current_user.id:
             raise ValidationError(_("You cannot send a PM to yourself."))
 
-    def save(self, from_user, to_user, user_id, unread, as_draft=False,
-             shared_id=None):
+    def save(
+        self,
+        from_user,
+        to_user,
+        user_id,
+        unread,
+        as_draft=False,
+        shared_id=None,
+    ):
 
         conversation = Conversation(
             subject=self.subject.data,
@@ -56,15 +70,17 @@ class ConversationForm(FlaskForm):
             from_user_id=from_user,
             to_user_id=to_user,
             user_id=user_id,
-            unread=unread
+            unread=unread,
         )
         message = Message(message=self.message.data, user_id=from_user)
         return conversation.save(message=message)
 
 
 class MessageForm(FlaskForm):
-    message = TextAreaField(_("Message"), validators=[
-        DataRequired(message=_("A message is required."))])
+    message = TextAreaField(
+        _("Message"),
+        validators=[DataRequired(message=_("A message is required."))],
+    )
     submit = SubmitField(_("Send Message"))
 
     def save(self, conversation, user_id, unread=False):

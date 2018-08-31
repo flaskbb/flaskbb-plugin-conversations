@@ -6,7 +6,7 @@ def test_conversation_save(conversation):
     message = Message(
         user_id=conversation.user_id,
         conversation_id=conversation.id,
-        message="Hello World"
+        message="Hello World",
     )
     conversation.save(message=message)
     assert conversation.shared_id is not None
@@ -21,9 +21,6 @@ def test_last_message(conversation_msgs, user):
     conversation = conversation_msgs
     assert conversation.last_message.message == "Second message"
 
-    message = Message(
-        user_id=user.id,
-        message="Third message"
-    )
+    message = Message(user_id=user.id, message="Third message")
     conversation.save(message=message)
     assert conversation.last_message.message != "Second message"
