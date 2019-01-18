@@ -10,14 +10,13 @@
 """
 import os
 
-from flask_login import current_user
 from pluggy import HookimplMarker
 
+from flask_login import current_user
 from flaskbb.utils.helpers import real, render_template
 
 from .utils import get_latest_messages, get_unread_count
 from .views import conversations_bp
-
 
 __version__ = "1.0.3"
 
@@ -26,18 +25,22 @@ hookimpl = HookimplMarker("flaskbb")
 
 
 # connect the hooks
+@hookimpl
 def flaskbb_load_migrations():
     return os.path.join(os.path.dirname(__file__), "migrations")
 
 
+@hookimpl
 def flaskbb_load_translations():
     return os.path.join(os.path.dirname(__file__), "translations")
 
 
+@hookimpl
 def flaskbb_load_blueprints(app):
     app.register_blueprint(conversations_bp, url_prefix="/conversations")
 
 
+@hookimpl
 def flaskbb_tpl_user_nav_loggedin_before():
     return render_template(
         "_inject_navlink.html",
