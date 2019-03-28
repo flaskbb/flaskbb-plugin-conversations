@@ -3,9 +3,44 @@ Changelog
 
 Here you can see the full list of changes between each release.
 
-Version 0.1.0
+Version 1.0.4
 -------------
 
-Unreleased
+Released March 28th, 2019
+
+* Fixes some pluggy related deprecation warnings
+
+
+Version 1.0.3
+-------------
+
+Released June 2nd, 2018
+
+* Add translations
+* Fixes a 'null' endpoint
+* Fixes Quick Reply
+
+
+Version 1.0.2
+-------------
+
+Released March 26th, 2018
+
+* Include source distribution in releases
+* Fixes an old url_for reference
+
+
+Version 1.0.1
+-------------
+
+Released March 23rd, 2018
+
+* Fixes some hooks
+
+
+Version 1.0.0
+-------------
+
+Released February 23rd, 2018
 
 * Initial release
