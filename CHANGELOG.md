@@ -3,6 +3,14 @@ Changelog
 
 Here you can see the full list of changes between each release.
 
+Version 1.0.5
+-------------
+
+Released March 29th, 2019
+
+* Include migrations/ directory in wheel and sdist distribution
+
+
 Version 1.0.4
 -------------
 

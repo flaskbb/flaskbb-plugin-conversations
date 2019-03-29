@@ -18,7 +18,7 @@ from flaskbb.utils.helpers import real, render_template
 from .utils import get_latest_messages, get_unread_count
 from .views import conversations_bp
 
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 
 
 # Temp fix until https://github.com/flaskbb/flaskbb/pull/509 is merged
