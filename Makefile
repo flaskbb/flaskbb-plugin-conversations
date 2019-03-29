@@ -41,7 +41,7 @@ dist:
 	python setup.py sdist bdist_wheel
 
 upload:dist
-	twine upload dist/*
+	twine upload dist/* --skip-existing
 
 update-translations:
 	pybabel extract -F babel.cfg -k lazy_gettext -o conversations/translations/messages.pot .
