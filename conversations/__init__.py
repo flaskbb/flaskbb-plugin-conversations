@@ -21,6 +21,10 @@ from .views import conversations_bp
 __version__ = "1.0.4"
 
 
+# Temp fix until https://github.com/flaskbb/flaskbb/pull/509 is merged
+SETTINGS = None
+
+
 hookimpl = HookimplMarker("flaskbb")
 
 
