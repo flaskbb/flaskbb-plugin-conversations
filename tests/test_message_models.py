@@ -24,3 +24,7 @@ def test_last_message(conversation_msgs, user):
     message = Message(user_id=user.id, message="Third message")
     conversation.save(message=message)
     assert conversation.last_message.message != "Second message"
+
+
+def test_delete_user_with_conversations(conversation_msgs, user):
+    assert user.delete()

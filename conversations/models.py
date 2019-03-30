@@ -11,12 +11,10 @@
 """
 import logging
 
-from sqlalchemy_utils import UUIDType
-
 from flaskbb.extensions import db
 from flaskbb.utils.database import CRUDMixin, UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
-
+from sqlalchemy_utils import UUIDType
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +63,9 @@ class Conversation(db.Model, CRUDMixin):
     user = db.relationship(
         "User",
         lazy="joined",
-        backref=db.backref("conversations", lazy="dynamic"),
+        backref=db.backref(
+            "conversations", lazy="dynamic", passive_deletes=True
+        ),
         foreign_keys=[user_id],
     )
 
