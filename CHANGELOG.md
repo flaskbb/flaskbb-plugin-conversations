@@ -3,6 +3,14 @@ Changelog
 
 Here you can see the full list of changes between each release.
 
+Version 1.0.6
+-------------
+
+Released March 30th, 2019
+
+* Fixes an IntegrityError when deleting a user with conversations.
+
+
 Version 1.0.5
 -------------
 
