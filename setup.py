@@ -10,16 +10,22 @@
 """
 import ast
 import re
+import os
 
 from setuptools import find_packages, setup
 
 
-with open("conversations/__init__.py", "rb") as f:
-    version_line = re.search(
-        r"__version__\s+=\s+(.*)", f.read().decode("utf-8")
-    ).group(1)
-    version = str(ast.literal_eval(version_line))
+def read(*parts):
+    here = os.path.abspath(os.path.dirname(__file__))
+    with open(os.path.join(here, *parts), "r") as fp:
+        return fp.read()
 
+
+long_description = read("README.md")
+version_line = re.search(
+    r"__version__\s+=\s+(.*)", read("conversations", "__init__.py")
+).group(1)
+version = str(ast.literal_eval(version_line))
 
 setup(
     name="flaskbb-plugin-conversations",
@@ -33,7 +39,8 @@ setup(
     author="Peter Justin",
     author_email="peter.justin@outlook.com",
     description="A private messaging plugin for FlaskBB",
-    long_description=__doc__,
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     keywords="flaskbb plugin conversations messaging",
     packages=find_packages("."),
     include_package_data=True,

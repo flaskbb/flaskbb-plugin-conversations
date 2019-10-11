@@ -1,8 +1,8 @@
-conversations
+Conversations
 =============
 
 
-Private messaging for FlaskBB
+A private messaging plugin for FlaskBB.
 
 
 Installation
