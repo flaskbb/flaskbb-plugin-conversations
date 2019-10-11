@@ -3,6 +3,15 @@ Changelog
 
 Here you can see the full list of changes between each release.
 
+Version 1.0.7
+-------------
+
+Released October 10th, 2019
+
+* Fix translations not working correctly due to missing babel.cfg config
+  file.
+
+
 Version 1.0.6
 -------------
 
