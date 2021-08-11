@@ -12,6 +12,7 @@ import os
 
 from pluggy import HookimplMarker
 
+from jinja2 import Markup
 from flask_login import current_user
 from flaskbb.utils.helpers import real, render_template
 
@@ -39,7 +40,7 @@ def flaskbb_load_translations():
 
 @hookimpl
 def flaskbb_load_blueprints(app):
-    app.register_blueprint(conversations_bp, url_prefix="/conversations")
+    app.register_blueprint(conversations_bp, url_prefix="/conversations", template_dir="templates")
 
 
 @hookimpl
@@ -52,7 +53,7 @@ def flaskbb_tpl_user_nav_loggedin_before():
 
 
 @hookimpl(trylast=True)
-def flaskbb_tpl_profile_sidebar_stats(user):
+def flaskbb_tpl_profile_stats(user):
     return render_template("_inject_new_message_button.html", user=user)
 
 
