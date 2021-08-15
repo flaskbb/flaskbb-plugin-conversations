@@ -15,10 +15,8 @@
                 <div class="sidenav-btn">
                     <a href="{{ url_for('conversations_bp.new_conversation') }}" class="btn btn-success">{% trans %}New Message{% endtrans %}</a>
                 </div>
-                {{ navlink('conversations_bp.inbox', _('Inbox')) }}
-                {{ navlink('conversations_bp.sent', _('Sent')) }}
-                {{ navlink('conversations_bp.drafts', _('Drafts')) }}
-                {{ navlink('conversations_bp.trash', _('Trash')) }}
+                {{ navlink('conversations_bp.inbox', _('Conversations')) }}
+                {{ navlink('conversations_bp.archived', _('Archive')) }}
             </ul>
         </div><!--/.sidebar -->
     </div><!--/.col-sm-3 -->

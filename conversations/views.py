@@ -25,7 +25,6 @@ from flaskbb.utils.helpers import (
     real,
     register_view,
     render_template,
-    time_utcnow,
 )
 from flaskbb.utils.settings import flaskbb_config
 
@@ -80,7 +79,6 @@ class Inbox(MethodView):
         conversations = (
             Conversation.query.filter(
                 Conversation.user_id == current_user.id,
-                Conversation.draft == False,
                 Conversation.trash == False,
             )
             .order_by(Conversation.date_modified.desc())
@@ -178,24 +176,7 @@ class NewConversation(MethodView):
 
     def post(self):
         form = self.form()
-        if "save_message" in request.form and form.validate():
-            to_user = User.query.filter_by(username=form.to_user.data).first()
-
-            shared_id = uuid.uuid4()
-
-            form.save(
-                from_user=current_user.id,
-                to_user=to_user.id,
-                user_id=current_user.id,
-                unread=False,
-                as_draft=True,
-                shared_id=shared_id,
-            )
-
-            flash(_("Message saved."), "success")
-            return redirect(url_for("conversations_bp.drafts"))
-
-        if "send_message" in request.form and form.validate():
+        if form.validate_on_submit():
             check_message_box_space()
 
             to_user = User.query.filter_by(username=form.to_user.data).first()
@@ -231,87 +212,6 @@ class NewConversation(MethodView):
         )
 
 
-class EditConversation(MethodView):
-    decorators = [login_required]
-    form = ConversationForm
-
-    def get(self, conversation_id):
-        conversation = Conversation.query.filter_by(
-            id=conversation_id, user_id=current_user.id
-        ).first_or_404()
-
-        if not conversation.draft:
-            flash(_("You cannot edit a sent message."), "danger")
-            return redirect(url_for("conversations_bp.inbox"))
-
-        form = self.form()
-        form.to_user.data = conversation.to_user.username
-        form.subject.data = conversation.subject
-        form.message.data = conversation.first_message.message
-
-        return render_template(
-            "message_form.html", form=form, title=_("Edit Message")
-        )
-
-    def post(self, conversation_id):
-        conversation = Conversation.query.filter_by(
-            id=conversation_id, user_id=current_user.id
-        ).first_or_404()
-
-        if not conversation.draft:
-            flash(_("You cannot edit a sent message."), "danger")
-            return redirect(url_for("conversations_bp.inbox"))
-
-        form = self.form()
-
-        if request.method == "POST":
-            if "save_message" in request.form:
-                to_user = User.query.filter_by(
-                    username=form.to_user.data
-                ).first()
-
-                conversation.draft = True
-                conversation.to_user_id = to_user.id
-                conversation.first_message.message = form.message.data
-                conversation.save()
-
-                flash(_("Message saved."), "success")
-                return redirect(url_for("conversations_bp.drafts"))
-
-            if "send_message" in request.form and form.validate():
-                check_message_box_space()
-
-                to_user = User.query.filter_by(
-                    username=form.to_user.data
-                ).first()
-                # Save the message in the recievers inbox
-                form.save(
-                    from_user=current_user.id,
-                    to_user=to_user.id,
-                    user_id=to_user.id,
-                    unread=True,
-                    shared_id=conversation.shared_id,
-                )
-
-                # Move the message from ``Drafts`` to ``Sent``.
-                conversation.draft = False
-                conversation.to_user = to_user
-                conversation.date_created = time_utcnow()
-                conversation.save()
-                invalidate_cache(to_user)
-
-                flash(_("Message sent."), "success")
-                return redirect(url_for("conversations_bp.sent"))
-        else:
-            form.to_user.data = conversation.to_user.username
-            form.subject.data = conversation.subject
-            form.message.data = conversation.first_message.message
-
-        return render_template(
-            "message_form.html", form=form, title=_("Edit Message")
-        )
-
-
 class RawMessage(MethodView):
     decorators = [login_required]
 
@@ -332,7 +232,7 @@ class RawMessage(MethodView):
         )
 
 
-class MoveConversation(MethodView):
+class ArchiveConversation(MethodView):
     decorators = [login_required]
 
     def post(self, conversation_id):
@@ -346,7 +246,7 @@ class MoveConversation(MethodView):
         return redirect(url_for("conversations_bp.inbox"))
 
 
-class RestoreConversation(MethodView):
+class UnarchiveConversation(MethodView):
     decorators = [login_required]
 
     def post(self, conversation_id):
@@ -356,7 +256,7 @@ class RestoreConversation(MethodView):
 
         conversation.trash = False
         conversation.save()
-        return redirect(url_for("conversations_bp.trash"))
+        return redirect(url_for("conversations_bp.archived"))
 
 
 class DeleteConversation(MethodView):
@@ -368,51 +268,10 @@ class DeleteConversation(MethodView):
         ).first_or_404()
 
         conversation.delete()
-        return redirect(url_for("conversations_bp.trash"))
+        return redirect(url_for("conversations_bp.archived"))
 
 
-class SentMessages(MethodView):
-    decorators = [login_required]
-
-    def get(self):
-
-        page = request.args.get("page", 1, type=int)
-
-        conversations = (
-            Conversation.query.filter(
-                Conversation.user_id == current_user.id,
-                Conversation.draft == False,
-                Conversation.trash == False,
-                db.not_(Conversation.to_user_id == current_user.id),
-            )
-            .order_by(Conversation.date_modified.desc())
-            .paginate(page, flaskbb_config["TOPICS_PER_PAGE"], False)
-        )
-
-        return render_template("sent.html", conversations=conversations)
-
-
-class DraftMessages(MethodView):
-    decorators = [login_required]
-
-    def get(self):
-
-        page = request.args.get("page", 1, type=int)
-
-        conversations = (
-            Conversation.query.filter(
-                Conversation.user_id == current_user.id,
-                Conversation.draft == True,
-                Conversation.trash == False,
-            )
-            .order_by(Conversation.date_modified.desc())
-            .paginate(page, flaskbb_config["TOPICS_PER_PAGE"], False)
-        )
-
-        return render_template("drafts.html", conversations=conversations)
-
-
-class TrashedMessages(MethodView):
+class ArchivedMessages(MethodView):
     decorators = [login_required]
 
     def get(self):
@@ -428,16 +287,16 @@ class TrashedMessages(MethodView):
             .paginate(page, flaskbb_config["TOPICS_PER_PAGE"], False)
         )
 
-        return render_template("trash.html", conversations=conversations)
+        return render_template("archived.html", conversations=conversations)
 
 
-register_view(
-    conversations_bp,
-    routes=["/drafts"],
-    view_func=DraftMessages.as_view("drafts"),
-)
 register_view(
     conversations_bp, routes=["/", "/inbox"], view_func=Inbox.as_view("inbox")
+)
+register_view(
+    conversations_bp,
+    routes=["/archived"],
+    view_func=ArchivedMessages.as_view("archived"),
 )
 register_view(
     conversations_bp,
@@ -446,18 +305,13 @@ register_view(
 )
 register_view(
     conversations_bp,
-    routes=["/<int:conversation_id>/edit"],
-    view_func=EditConversation.as_view("edit_conversation"),
+    routes=["/<int:conversation_id>/archive"],
+    view_func=ArchiveConversation.as_view("archive_conversation"),
 )
 register_view(
     conversations_bp,
-    routes=["/<int:conversation_id>/move"],
-    view_func=MoveConversation.as_view("move_conversation"),
-)
-register_view(
-    conversations_bp,
-    routes=["/<int:conversation_id>/restore"],
-    view_func=RestoreConversation.as_view("restore_conversation"),
+    routes=["/<int:conversation_id>/unarchive"],
+    view_func=UnarchiveConversation.as_view("unarchive_conversation"),
 )
 register_view(
     conversations_bp,
@@ -470,15 +324,7 @@ register_view(
     view_func=RawMessage.as_view("raw_message"),
 )
 register_view(
-    conversations_bp, routes=["/sent"], view_func=SentMessages.as_view("sent")
-)
-register_view(
     conversations_bp,
     routes=["/new"],
     view_func=NewConversation.as_view("new_conversation"),
-)
-register_view(
-    conversations_bp,
-    routes=["/trash"],
-    view_func=TrashedMessages.as_view("trash"),
 )

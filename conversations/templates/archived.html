@@ -8,6 +8,6 @@
 {% set include_delete = True %}
 {% include theme("conversation_list.html") %}
 
-{{ render_pagination(conversations, url_for("conversations_bp.trash")) }}
+{{ render_pagination(conversations, url_for("conversations_bp.archived")) }}
 
 {% endblock %}

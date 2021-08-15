@@ -53,7 +53,7 @@ def flaskbb_tpl_user_nav_loggedin_before():
 
 
 @hookimpl(trylast=True)
-def flaskbb_tpl_profile_stats(user):
+def flaskbb_tpl_profile_actions(user):
     return render_template("_inject_new_message_button.html", user=user)
 
 
