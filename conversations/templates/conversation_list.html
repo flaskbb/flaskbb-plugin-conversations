@@ -1,109 +1,93 @@
 {% from theme('_macros/pagination.html') import generate_obj_id %}
-<div class="card conversation mb-3">
-    <div class="card-header conversation-header">
-        <div class="row">
-            <div class="col me-auto">
-                <span class="fa fa-comment"></span> {% trans %}Conversations{% endtrans %}
-            </div>
 
-            <div class="col-auto">
-                <span class="badge bg-info" title="The amount of all conversations" data-bs-toggle="tooltip">
-                    {{ current_user.message_count or 0 }}/{{ flaskbb_config["MESSAGE_QUOTA"] }}
-                </span>
-            </div>
-        </div>
-    </div>
-
-    <div class="card-body conversation-body">
-        {% for conversation in conversations.items %}
-        <div class="row conversation-row hover {% if conversation.unread %}unread{% endif %}">
-            <!-- avatar -->
-            <div class="col-md-1 col-sm-2 col-2 conversation-avatar">
-                {% if conversation.from_user and conversation.from_user.avatar %}
-                <img src="{{ conversation.from_user.avatar }}" class="rounded" alt="avatar" width="65px" height="65px" />
-                {% else %}
-                <img src="{{ url_for('static', filename='avatar80x80.png') }}" class="rounded" alt="avatar" width="65px" height="65px" />
-                {% endif %}
-            </div>
-            <!-- other stuff -->
-            <div class="col-md-11 col-sm-10 col-10 conversation-info">
-                <!-- subject -->
-                <div class="conversation-subject">
-                    <a href="{{ url_for('conversations_bp.view_conversation', conversation_id=conversation.id) }}">
-                        {% if conversation.unread %}
-                            <strong>{{ conversation.subject }}</strong>
-                        {% else %}
-                            {{ conversation.subject }}
-                        {% endif %}
-                    </a>
-                    <div class="float-end">
-                        <strong><small>#{{ generate_obj_id(conversations, loop.index, flaskbb_config["TOPICS_PER_PAGE"]) }}</small></strong>
-                    </div>
-                </div>
-                <!-- meta info (date, user) -->
-                <div class="conversation-meta text-small">
-                    {% trans %}From{% endtrans %}
-                    {% if conversation.from_user %}
-                        <a href="{{ conversation.from_user.url }}">{{ conversation.from_user.username }}</a>
-                    {% else %}
-                        {% trans %}Deleted User{% endtrans %}
-                    {% endif %}
-
-                    {% trans %}to{% endtrans %}
-                    {% if conversation.to_user %}
-                        <a href="{{ conversation.to_user.url }}">{{ conversation.to_user.username }}</a>
-                    {% else %}
-                        {% trans %}Deleted User{% endtrans %}
-                    {% endif %}
-                    {% trans %}on{% endtrans %} {{ conversation.last_message.date_created|format_date("%d %B %Y - %H:%M") }}
-                </div>
-                <!-- actual content -->
-                <div class="conversation-content">
-                    {{ conversation.last_message.message|crop_title(150)|markup }}
-                </div>
-                <!-- actions -->
-                <div class="conversation-actions">
-                    {% if include_move %}
-                    <form class="d-inline" method="POST" action="{{ url_for('conversations_bp.move_conversation', conversation_id=conversation.id) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                        <button type="submit" class="btn btn-info btn-xs" title="Move to Trash" data-bs-toggle="tooltip">
-                            <span class="fas fa-archive"></span>
-                        </button>
-                    </form>
-                    {% endif %}
-
-                    {% if include_delete %}
-                    <form class="d-inline" method="POST" action="{{ url_for('conversations_bp.delete_conversation', conversation_id=conversation.id) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                        <button type="submit" class="btn btn-danger btn-xs" title="Delete this conversation" data-bs-toggle="tooltip">
-                            <span class="fas fa-trash-alt"></span>
-                        </button>
-                    </form>
-                    {% endif %}
-
-                    {% if include_restore %}
-                    <form class="d-inline" method="POST" action="{{ url_for('conversations_bp.restore_conversation', conversation_id=conversation.id) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                        <button type="submit" class="btn btn-success btn-xs" title="Restore this conversation" data-bs-toggle="tooltip">
-                            <span class="fas fa-undo"></span>
-                        </button>
-                    </form>
-                    {% endif %}
-
-                    {% if include_edit %}
-                    <a class="btn btn-success btn-xs" alt="Edit" title="Edit this conversation" href="{{ url_for('conversations_bp.edit_conversation', conversation_id = conversation.id) }}" data-bs-toggle="tooltip">
-                        <span class="fa fa-pencil"></span>
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+{% for conversation in conversations.items %}
+<div class="row conversation-row hover {% if conversation.unread %}unread{% endif %}">
+    <!-- avatar -->
+    <div class="col-md-1 col-sm-2 col-2 conversation-avatar">
+        {% if conversation.from_user and conversation.from_user.avatar %}
+        <img src="{{ conversation.from_user.avatar }}" class="rounded" alt="avatar" width="65px" height="65px" />
         {% else %}
-        <div class="row conversation-row">
-            <div class="col-md-12 col-sm-12 col-12">
-                {% trans %}No conversations found.{% endtrans %}
+        <img src="{{ url_for('static', filename='avatar80x80.png') }}" class="rounded" alt="avatar" width="65px" height="65px" />
+        {% endif %}
+    </div>
+    <!-- other stuff -->
+    <div class="col-md-11 col-sm-10 col-10 conversation-info">
+        <!-- subject -->
+        <div class="conversation-subject">
+            <a href="{{ url_for('conversations_bp.view', conversation_id=conversation.id) }}">
+                {% if conversation.unread %}
+                    <strong>{{ conversation.subject }}</strong>
+                {% else %}
+                    {{ conversation.subject }}
+                {% endif %}
+            </a>
+            <div class="float-end">
+                <strong><small>#{{ generate_obj_id(conversations, loop.index, flaskbb_config["TOPICS_PER_PAGE"]) }}</small></strong>
             </div>
         </div>
-        {% endfor %}
+        <!-- meta info (date, user) -->
+        <div class="conversation-meta text-small">
+            {% trans %}From{% endtrans %}
+            {% if conversation.from_user %}
+                <a href="{{ conversation.from_user.url }}">{{ conversation.from_user.username }}</a>
+            {% else %}
+                {% trans %}Deleted User{% endtrans %}
+            {% endif %}
+
+            {% trans %}to{% endtrans %}
+            {% if conversation.to_user %}
+                <a href="{{ conversation.to_user.url }}">{{ conversation.to_user.username }}</a>
+            {% else %}
+                {% trans %}Deleted User{% endtrans %}
+            {% endif %}
+            <!-- %d %B %Y - %H:%M -->
+            {% trans %}on{% endtrans %} {{ conversation.last_message.date_created|format_time }}
+        </div>
+        <!-- actual content -->
+        <div class="conversation-content">
+            {{ conversation.last_message.message|crop_title(150)|markup }}
+        </div>
+        <!-- actions -->
+        <div class="conversation-actions">
+            {% if include_move %}
+            <form class="d-inline" method="POST" action="{{ url_for('conversations_bp.archive', conversation_id=conversation.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit" class="btn btn-info btn-xs" title="Move to Trash" data-bs-toggle="tooltip">
+                    <span class="fas fa-archive"></span>
+                </button>
+            </form>
+            {% endif %}
+
+            {% if include_delete %}
+            <form class="d-inline" method="POST" action="{{ url_for('conversations_bp.delete', conversation_id=conversation.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit" class="btn btn-danger btn-xs" title="Delete this conversation" data-bs-toggle="tooltip">
+                    <span class="fas fa-trash-alt"></span>
+                </button>
+            </form>
+            {% endif %}
+
+            {% if include_restore %}
+            <form class="d-inline" method="POST" action="{{ url_for('conversations_bp.unarchive', conversation_id=conversation.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit" class="btn btn-success btn-xs" title="Restore this conversation" data-bs-toggle="tooltip">
+                    <span class="fas fa-undo"></span>
+                </button>
+            </form>
+            {% endif %}
+
+            {% if include_edit %}
+            <a class="btn btn-success btn-xs" alt="Edit" title="Edit this conversation" href="{{ url_for('conversations_bp.edit', conversation_id = conversation.id) }}" data-bs-toggle="tooltip">
+                <span class="fa fa-pencil"></span>
+            </a>
+            {% endif %}
+        </div>
     </div>
 </div>
+{% else %}
+<div class="row conversation-row">
+    <div class="col-12">
+        {% trans %}No conversations selected.{% endtrans %}
+    </div>
+</div>
+{% endfor %}

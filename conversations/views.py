@@ -18,7 +18,6 @@ from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_required
 
-from flaskbb.extensions import db
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import (
     format_quote,
@@ -30,14 +29,12 @@ from flaskbb.utils.settings import flaskbb_config
 
 from .forms import ConversationForm, MessageForm
 from .models import Conversation, Message
-from .utils import get_message_count, invalidate_cache
+from .utils import get_message_count, get_archived_count, invalidate_cache
 
 
 logger = logging.getLogger(__name__)
 
-conversations_bp = Blueprint(
-    "conversations_bp", __name__, template_folder="templates"
-)
+conversations_bp = Blueprint("conversations_bp", __name__, template_folder="templates")
 
 
 def check_message_box_space(redirect_to=None):
@@ -75,17 +72,11 @@ class Inbox(MethodView):
 
     def get(self):
         page = request.args.get("page", 1, type=int)
-        # the inbox will display both, the recieved and the sent messages
-        conversations = (
-            Conversation.query.filter(
-                Conversation.user_id == current_user.id,
-                Conversation.trash == False,
-            )
-            .order_by(Conversation.date_modified.desc())
-            .paginate(page, flaskbb_config["TOPICS_PER_PAGE"], False)
+        return render_template(
+            "inbox.html",
+            conversations=Conversation.get_inbox(current_user, page),
+            archived_count=Conversation.get_archived_count(current_user),
         )
-
-        return render_template("inbox.html", conversations=conversations)
 
 
 class ViewConversation(MethodView):
@@ -93,6 +84,7 @@ class ViewConversation(MethodView):
     form = MessageForm
 
     def get(self, conversation_id):
+        page = request.args.get("page", 1, type=int)
         conversation = Conversation.query.filter_by(
             id=conversation_id, user_id=current_user.id
         ).first_or_404()
@@ -104,11 +96,16 @@ class ViewConversation(MethodView):
 
         form = self.form()
         return render_template(
-            "conversation.html", conversation=conversation, form=form
+            "conversation.html",
+            conversation=conversation,
+            conversations=Conversation.get_inbox(current_user, page),
+            archived_count=Conversation.get_archived_count(current_user),
+            form=form,
         )
 
     @require_message_box_space
     def post(self, conversation_id):
+        page = request.args.get("page", 1, type=int)
         conversation = Conversation.query.filter_by(
             id=conversation_id, user_id=current_user.id
         ).first_or_404()
@@ -138,7 +135,6 @@ class ViewConversation(MethodView):
             # the recieving message
             if conversation is None:
                 conversation = Conversation(
-                    subject=old_conv.subject,
                     from_user=real(current_user),
                     to_user=to_user,
                     user_id=to_user_id,
@@ -146,20 +142,22 @@ class ViewConversation(MethodView):
                 )
                 conversation.save()
 
-            form.save(
-                conversation=conversation, user_id=current_user.id, unread=True
-            )
+            form.save(conversation=conversation, user_id=current_user.id, unread=True)
             invalidate_cache(conversation.to_user)
 
             return redirect(
                 url_for(
-                    "conversations_bp.view_conversation",
+                    "conversations_bp.view",
                     conversation_id=old_conv.id,
                 )
             )
 
         return render_template(
-            "conversation.html", conversation=conversation, form=form
+            "conversation.html",
+            conversation=conversation,
+            conversations=Conversation.get_inbox(current_user, page),
+            archived_count=Conversation.get_archived_count(current_user),
+            form=form,
         )
 
 
@@ -170,9 +168,7 @@ class NewConversation(MethodView):
     def get(self):
         form = self.form()
         form.to_user.data = request.args.get("to_user")
-        return render_template(
-            "message_form.html", form=form, title=_("Compose Message")
-        )
+        return self._render(form)
 
     def post(self):
         form = self.form()
@@ -181,34 +177,28 @@ class NewConversation(MethodView):
 
             to_user = User.query.filter_by(username=form.to_user.data).first()
 
-            # this is the shared id between conversations because the messages
-            # are saved on both ends
-            shared_id = uuid.uuid4()
+            has_conv = Conversation.query.filter(
+                Conversation.to_user == to_user,
+                Conversation.user_id == current_user.id
+            ).first()
 
             # Save the message in the current users inbox
-            form.save(
-                from_user=current_user.id,
-                to_user=to_user.id,
-                user_id=current_user.id,
-                unread=False,
-                shared_id=shared_id,
-            )
-
-            # Save the message in the recievers inbox
-            form.save(
-                from_user=current_user.id,
-                to_user=to_user.id,
-                user_id=to_user.id,
-                unread=True,
-                shared_id=shared_id,
-            )
+            conv = Conversation.create(form.message.data, current_user, to_user)
             invalidate_cache(to_user)
 
             flash(_("Message sent."), "success")
-            return redirect(url_for("conversations_bp.sent"))
+            return redirect(url_for("conversations_bp.view", conversation_id=conv.id))
 
+        return self._render(form)
+
+    def _render(self, form):
+        page = request.args.get("page", 1, type=int)
         return render_template(
-            "message_form.html", form=form, title=_("Compose Message")
+            "new.html",
+            conversations=Conversation.get_inbox(current_user, page),
+            archived_count=Conversation.get_archived_count(current_user),
+            form=form,
+            title=_("Compose Message"),
         )
 
 
@@ -227,9 +217,7 @@ class RawMessage(MethodView):
         ):
             abort(404)
 
-        return format_quote(
-            username=message.user.username, content=message.message
-        )
+        return format_quote(username=message.user.username, content=message.message)
 
 
 class ArchiveConversation(MethodView):
@@ -298,25 +286,26 @@ register_view(
     routes=["/archived"],
     view_func=ArchivedMessages.as_view("archived"),
 )
+
 register_view(
     conversations_bp,
     routes=["/<int:conversation_id>/delete"],
-    view_func=DeleteConversation.as_view("delete_conversation"),
+    view_func=DeleteConversation.as_view("delete"),
 )
 register_view(
     conversations_bp,
     routes=["/<int:conversation_id>/archive"],
-    view_func=ArchiveConversation.as_view("archive_conversation"),
+    view_func=ArchiveConversation.as_view("archive"),
 )
 register_view(
     conversations_bp,
     routes=["/<int:conversation_id>/unarchive"],
-    view_func=UnarchiveConversation.as_view("unarchive_conversation"),
+    view_func=UnarchiveConversation.as_view("unarchive"),
 )
 register_view(
     conversations_bp,
     routes=["/<int:conversation_id>/view"],
-    view_func=ViewConversation.as_view("view_conversation"),
+    view_func=ViewConversation.as_view("view"),
 )
 register_view(
     conversations_bp,
@@ -326,5 +315,5 @@ register_view(
 register_view(
     conversations_bp,
     routes=["/new"],
-    view_func=NewConversation.as_view("new_conversation"),
+    view_func=NewConversation.as_view("new"),
 )

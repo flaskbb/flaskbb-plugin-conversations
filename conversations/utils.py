@@ -41,6 +41,18 @@ def get_message_count(user):
 
 
 @cache.memoize()
+def get_archived_count(user):
+    """Returns the number of archived messages of the given user.
+
+    :param user: The user object.
+    """
+    return Conversation.query.filter(
+        Conversation.user_id == user.id,
+        Conversation.trash == True,
+    ).count()
+
+
+@cache.memoize()
 def get_latest_messages(user):
     """Returns all unread messages for the given user.
 

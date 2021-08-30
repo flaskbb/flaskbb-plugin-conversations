@@ -1,13 +1,10 @@
 {% set page_title = _("Trash") %}
 
 {% from theme('_macros/pagination.html') import render_pagination %}
-{% extends theme("message_layout.html") %}
+{% extends theme("conversation_layout.html") %}
 {% block message_content %}
 
 {% set include_restore = True %}
 {% set include_delete = True %}
-{% include theme("conversation_list.html") %}
-
-{{ render_pagination(conversations, url_for("conversations_bp.archived")) }}
 
 {% endblock %}

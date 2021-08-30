@@ -31,18 +31,12 @@ class ConversationForm(FlaskForm):
         validators=[DataRequired(message=_("A valid username is required."))],
     )
 
-    subject = StringField(
-        _("Subject"),
-        validators=[DataRequired(message=_("A Subject is required."))],
-    )
-
     message = TextAreaField(
         _("Message"),
         validators=[DataRequired(message=_("A message is required."))],
     )
 
-    send_message = SubmitField(_("Start Conversation"))
-    save_message = SubmitField(_("Save Conversation"))
+    submit = SubmitField(_("Start Conversation"))
 
     def validate_to_user(self, field):
         user = User.query.filter_by(username=field.data).first()
@@ -59,13 +53,10 @@ class ConversationForm(FlaskForm):
         to_user,
         user_id,
         unread,
-        as_draft=False,
         shared_id=None,
     ):
 
         conversation = Conversation(
-            subject=self.subject.data,
-            draft=as_draft,
             shared_id=shared_id,
             from_user_id=from_user,
             to_user_id=to_user,
@@ -81,7 +72,7 @@ class MessageForm(FlaskForm):
         _("Message"),
         validators=[DataRequired(message=_("A message is required."))],
     )
-    submit = SubmitField(_("Send Message"))
+    submit = SubmitField(_("Send"))
 
     def save(self, conversation, user_id, unread=False):
         """Saves the form data to the model.
@@ -91,9 +82,4 @@ class MessageForm(FlaskForm):
         :param reciever: If the message should also be stored in the recievers
                          inbox.
         """
-        message = Message(message=self.message.data, user_id=user_id)
-
-        if unread:
-            conversation.unread = True
-            conversation.save()
-        return message.save(conversation)
+        return Message.create(self.message.data, user_id, conversation)

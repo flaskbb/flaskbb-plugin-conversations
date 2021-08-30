@@ -1,5 +1,5 @@
 {% if current_user.is_authenticated and current_user != user %}
-<a class="btn btn-sm btn-primary" href="{{url_for('conversations_bp.new_conversation') }}?to_user={{ user.username }}">
+<a class="btn btn-sm btn-primary" href="{{url_for('conversations_bp.new') }}?to_user={{ user.username }}">
     <span class="fas fa-envelope"></span> {% trans %}Message{% endtrans %}
 </a>
 {% endif %}

@@ -1,0 +1,42 @@
+{% extends theme("conversation_layout.html") %}
+{% from theme("_macros/form.html") import render_input_field, render_submit_field %}
+{% from theme("_macros/utils.html") import avatar_img %}
+
+{% block message_content %}
+<form action="#" method="post">
+{{ form.hidden_tag() }}
+
+<div class="card conversation border-0">
+    <div class="card-header conversation-header">
+        <div class="d-flex align-items-center">
+            <div class="position-relative">
+                {{ avatar_img("None", class="rounded-circle me-1", size="80") }}
+            </div>
+            <div class="flex-grow-1 ps-3">
+                <div class="author-title fw-bold col-5">
+                    {{ render_input_field(form.to_user) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-column">
+            You are about to start a new conversation
+        </div>
+    </div>
+
+    <div class="flex-grow-0 py-3 px-4 border-top">
+        <div class="row conversation-reply">
+            <div class="col">
+                {{ render_input_field(form.message, required="required", **{ "data-autoresize": "true"}) }}
+            </div>
+
+            <div class="col-auto">
+                {{ render_input_field(form.submit, div_class="mt-3", class="btn btn-success") }}
+            </div>
+        </div>
+    </div>
+</div>
+
+</form>
+{% endblock %}

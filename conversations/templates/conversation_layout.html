@@ -1,0 +1,62 @@
+{% extends theme("layout.html") %}
+{% block content %}
+{% from theme('_macros/navigation.html') import is_active, navlink with context %}
+
+<ol class="breadcrumb flaskbb-breadcrumb bg-light">
+    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('user.profile', username=current_user.username) }}">{{ current_user.username }}</a></li>
+    <li class="breadcrumb-item active">{% trans %}Conversations{% endtrans %}</li>
+</ol>
+
+<div class="card conversation">
+    <div class="card-header conversation-header">
+        <div class="row">
+            <div class="col me-auto">
+                <span class="fa fa-comment"></span> {% trans %}Conversations{% endtrans %}
+            </div>
+
+            <div class="col-auto">
+                <span class="badge bg-info" title="The amount of all conversations" data-bs-toggle="tooltip">
+                    {{ current_user.message_count or 0 }}/{{ flaskbb_config["MESSAGE_QUOTA"] }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body conversation-body">
+        <div class="row">
+            <div class="col-sm-3 pe-0 border-end">
+                <div class="p-2">
+                    <a href="{{ url_for('conversations_bp.new') }}" class="btn btn-outline-primary w-100">{% trans %}New Message{% endtrans %}</a>
+                </div>
+                {% if conversations.items|length > 0 %}
+                <div class="list-group list-group-flush border-top border-bottom mb-3">
+                  {% for conv in conversations.items %}
+                  <a href="{{ url_for('conversations_bp.view', conversation_id=conv.id) }}" class="list-group-item list-group-item-action {% if(conv.id == request.view_args.get("conversation_id")) %}active{% endif %}" aria-current="true">
+                    <div class="d-flex w-100 justify-content-between">
+                    {% if conv.to_user %}
+                        <h5 class="mb-1">{{ conv.to_user.username }}</h5>
+                    {% else %}
+                        {% trans %}Deleted User{% endtrans %}
+                    {% endif %}
+                      <small class="">{{ conv.date_modified|time_since }}</small>
+                    </div>
+                    <small class="text-truncate text-nowrap">{{ conv.last_message.message|crop_title(20) }}</small>
+                  </a>
+                  {% endfor %}
+                </div>
+                {% endif %}
+
+                {%  if archived_count > 0 %}
+                <div class="p-1 mt-auto">
+                    <a href="{{ url_for('conversations_bp.archived') }}" class="btn btn-outline-dark w-100">{% trans %}Archive{% endtrans %}</a>
+                </div>
+                {% endif %}
+            </div><!--/.col-sm-3 -->
+            <div class="col-sm-9 ps-0">
+                {% block message_content %}{% endblock %}
+            </div><!--/.col-sm-9 -->
+        </div><!--/.row -->
+    </div>
+</div>
+{% endblock %}

@@ -15,7 +15,7 @@
         <ul class="dropdown-menu dropdown-messages" aria-labelledby="navbarConvDropdown">
             {% for message in unread_messages %}
             <li>
-                <a class="dropdown-item" href="{{ url_for('conversations_bp.view_conversation', conversation_id=message.id) }}">
+                <a class="dropdown-item" href="{{ url_for('conversations_bp.view', conversation_id=message.id) }}">
                     <div>
                         {% if message.from_user %}
                             <span class="author-name">{{ message.from_user.username }}</span>
@@ -32,7 +32,7 @@
             {% endfor %}
             <li class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{{ url_for('conversations_bp.inbox') }}"><span class="fas fa-envelope fa-fw"></span> {% trans %}Inbox{% endtrans %}</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('conversations_bp.new_conversation') }}"><span class="fas fa-pen fa-fw"></span> {% trans %}New Message{% endtrans %}</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('conversations_bp.new') }}"><span class="fas fa-pen fa-fw"></span> {% trans %}New Message{% endtrans %}</a></li>
         </ul>
     </li>
 </ul>
