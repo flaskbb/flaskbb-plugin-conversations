@@ -31,17 +31,25 @@
 {% block scripts %}
 <script>
     // Reply conversation
-    $('.reply-btn').click(function (event) {
-        event.preventDefault();
-        var message_id = $(this).attr('data-message-id');
+    document.querySelectorAll(".reply-btn").forEach((el) =>
+        el.addEventListener("click", (event) => {
+            event.preventDefault();
+            const messageId = event.target.dataset.messageId;
+            const url = `/conversations/message/${messageId}/raw`;
 
-        $.get('/conversations/message/' + message_id + '/raw', function(text) {
-            var $contents = $('.flaskbb-editor');
-            $contents.val(($contents.val() + '\n' + text).trim() + '\n');
-            $contents.selectionStart = $contents.selectionEnd = $contents.val().length;
-            $contents[0].scrollTop = $contents[0].scrollHeight;
-            window.location.href = '#content';
-        });
-    });
+            const editor = document.querySelector(".flaskbb-editor");
+            fetch(url)
+                .then((response) => response.text())
+                .then((data) => {
+                    editor.value = data;
+                    editor.selectionStart = editor.selectionEnd = editor.value.length;
+                    editor.scrollTop = editor.scrollHeight;
+                    window.location.href = "#content";
+                })
+                .catch((error) => {
+                    console.error("something bad happened", error);
+                });
+        })
+    );
 </script>
 {% endblock %}

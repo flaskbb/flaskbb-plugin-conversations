@@ -55,7 +55,7 @@
                     {% else %}
                         {% trans %}Deleted User{% endtrans %}
                     {% endif %}
-                    {% trans %}on{% endtrans %} {{ conversation.last_message.date_created|format_date("%d %B %Y - %H:%M") }}
+                    {% trans %}on{% endtrans %} {{ conversation.last_message.date_created|format_datetime }}
                 </div>
                 <!-- actual content -->
                 <div class="conversation-content">
