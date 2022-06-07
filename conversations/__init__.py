@@ -12,7 +12,6 @@ import os
 
 from pluggy import HookimplMarker
 
-from jinja2 import Markup
 from flask_login import current_user
 from flaskbb.utils.helpers import real, render_template
 
