@@ -3,6 +3,14 @@ Changelog
 
 Here you can see the full list of changes between each release.
 
+Version 1.1.1
+-------------
+
+Released June 7th, 2022
+
+* Removes an unused import which in turn fixes a dependency error
+
+
 Version 1.0.7
 -------------
 
