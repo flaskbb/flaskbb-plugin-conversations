@@ -1,10 +1,10 @@
 import uuid
 
 import pytest
-
-from conversations.models import Conversation, Message
 from tests.fixtures.app import *
 from tests.fixtures.user import *
+
+from conversations.models import Conversation, Message
 
 
 @pytest.fixture

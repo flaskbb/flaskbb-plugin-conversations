@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-    conversations.views
-    ~~~~~~~~~~~~~~~~~~~
+conversations.views
+~~~~~~~~~~~~~~~~~~~
 
-    This module contains the forms for the
-    conversations Plugin.
+This module contains the forms for the
+conversations Plugin.
 
-    :copyright: (c) 2018 by Peter Justin.
-    :license: BSD License, see LICENSE for more details.
+:copyright: (c) 2018 by Peter Justin.
+:license: BSD License, see LICENSE for more details.
 """
+
 import logging
+from uuid import UUID
 
 from flask_babelplus import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField, ValidationError
+from flaskbb.user.models import User
+from wtforms import Field, StringField, SubmitField, TextAreaField, ValidationError
 from wtforms.validators import DataRequired
 
-from flaskbb.user.models import User
-
 from .models import Conversation, Message
-
 
 logger = logging.getLogger(__name__)
 
@@ -44,25 +44,22 @@ class ConversationForm(FlaskForm):
     send_message = SubmitField(_("Start Conversation"))
     save_message = SubmitField(_("Save Conversation"))
 
-    def validate_to_user(self, field):
-        user = User.query.filter_by(username=field.data).first()
+    def validate_to_user(self, field: Field):
+        user = User.get_by(username=field.data)
         if not user:
-            raise ValidationError(
-                _("The username you entered does not " "exist.")
-            )
+            raise ValidationError(_("The username you entered does not exist."))
         if user.id == current_user.id:
             raise ValidationError(_("You cannot send a PM to yourself."))
 
     def save(
         self,
-        from_user,
-        to_user,
-        user_id,
-        unread,
-        as_draft=False,
-        shared_id=None,
+        from_user: int,
+        to_user: int,
+        user_id: int,
+        unread: bool,
+        as_draft: bool = False,
+        shared_id: UUID | None = None,
     ):
-
         conversation = Conversation(
             subject=self.subject.data,
             draft=as_draft,
@@ -83,7 +80,7 @@ class MessageForm(FlaskForm):
     )
     submit = SubmitField(_("Send Message"))
 
-    def save(self, conversation, user_id, unread=False):
+    def save(self, conversation: Conversation, user_id: int, unread: bool = False):
         """Saves the form data to the model.
 
         :param conversation: The Conversation object.

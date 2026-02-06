@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-    conversations
-    ~~~~~~~~~~~~~
+conversations
+~~~~~~~~~~~~~
 
-    A conversations Plugin for FlaskBB.
+A conversations Plugin for FlaskBB.
 
-    :copyright: (c) 2018 by Peter Justin.
-    :license: BSD License, see LICENSE for more details.
+:copyright: (c) 2018 by Peter Justin.
+:license: BSD License, see LICENSE for more details.
 """
+
 import os
 
+from flask import Flask
+from flask_login import current_user
+from flaskbb.forum.models import Post
+from flaskbb.user.models import User
+from flaskbb.utils.helpers import real, render_template
 from pluggy import HookimplMarker
 
-from flask_login import current_user
-from flaskbb.utils.helpers import real, render_template
-
-from .utils import get_latest_messages, get_unread_count
+from .utils import get_latest_messages, get_message_count, get_unread_count
 from .views import conversations_bp
-
-__version__ = "1.1.1"
 
 # Temp fix until https://github.com/flaskbb/flaskbb/pull/509 is merged
 SETTINGS = None
@@ -38,8 +39,15 @@ def flaskbb_load_translations():
 
 
 @hookimpl
-def flaskbb_load_blueprints(app):
-    app.register_blueprint(conversations_bp, url_prefix="/conversations", template_dir="templates")
+def flaskbb_load_blueprints(app: Flask):
+    app.register_blueprint(
+        conversations_bp, url_prefix="/conversations", template_dir="templates"
+    )
+
+
+@hookimpl
+def flaskbb_current_user(app: Flask, user: User):
+    setattr(user, "message_count", get_message_count(user))
 
 
 @hookimpl
@@ -52,12 +60,10 @@ def flaskbb_tpl_user_nav_loggedin_before():
 
 
 @hookimpl(trylast=True)
-def flaskbb_tpl_profile_actions(user):
+def flaskbb_tpl_profile_actions(user: User):
     return render_template("_inject_new_message_button.html", user=user)
 
 
 @hookimpl(trylast=True)
-def flaskbb_tpl_post_author_info_after(user, post):
-    return render_template(
-        "_inject_new_message_link.html", user=user, post=post
-    )
+def flaskbb_tpl_post_author_info_after(user: User, post: Post):
+    return render_template("_inject_new_message_link.html", user=user, post=post)

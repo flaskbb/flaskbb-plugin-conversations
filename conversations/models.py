@@ -1,20 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-    conversations.views
-    ~~~~~~~~~~~~~~~~~~~
+conversations.views
+~~~~~~~~~~~~~~~~~~~
 
-    The models for the conversations and
-    messages are located here.
+The models for the conversations and
+messages are located here.
 
-    :copyright: (c) 2018 by Peter Justin.
-    :license: BSD License, see LICENSE for more details.
+:copyright: (c) 2018 by Peter Justin.
+:license: BSD License, see LICENSE for more details.
 """
+
+import datetime
 import logging
+import uuid
+from typing import override
 
 from flaskbb.extensions import db
+from flaskbb.user.models import User
 from flaskbb.utils.database import CRUDMixin, UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
-from sqlalchemy_utils import UUIDType
+from sqlalchemy import Boolean, ForeignKey, Integer, String, Text, Uuid
+from sqlalchemy.orm import Mapped, WriteOnlyMapped, mapped_column, relationship
 
 logger = logging.getLogger(__name__)
 
@@ -22,58 +28,56 @@ logger = logging.getLogger(__name__)
 class Conversation(db.Model, CRUDMixin):
     __tablename__ = "conversations"
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id", ondelete="CASCADE"),
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     )
-    from_user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id", ondelete="SET NULL"),
+    from_user_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
     )
-    to_user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id", ondelete="SET NULL"),
+    to_user_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
     )
-    shared_id = db.Column(UUIDType, nullable=False)
-    subject = db.Column(db.String(255), nullable=True)
-    date_created = db.Column(
+    shared_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
+    subject: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    date_created: Mapped[datetime.datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
-    date_modified = db.Column(
+    date_modified: Mapped[datetime.datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
-    trash = db.Column(db.Boolean, default=False, nullable=False)
-    draft = db.Column(db.Boolean, default=False, nullable=False)
-    unread = db.Column(db.Boolean, default=False, nullable=False)
+    trash: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    draft: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    unread: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    messages = db.relationship(
+    messages: Mapped[list["Message"]] = relationship(
         "Message",
         lazy="joined",
-        backref="conversation",
         primaryjoin="Message.conversation_id == Conversation.id",
         order_by="asc(Message.id)",
         cascade="all, delete-orphan",
     )
 
     # this is actually the users message box
-    user = db.relationship(
+    user: Mapped[User] = relationship(
         "User",
         lazy="joined",
-        backref=db.backref(
-            "conversations", lazy="dynamic", passive_deletes=True
-        ),
         foreign_keys=[user_id],
     )
 
     # the user to whom the conversation is addressed
-    to_user = db.relationship("User", lazy="joined", foreign_keys=[to_user_id])
+    to_user: Mapped[User] = relationship(
+        "User", lazy="joined", foreign_keys=[to_user_id]
+    )
 
     # the user who sent the message
-    from_user = db.relationship(
+    from_user: Mapped[User] = relationship(
         "User", lazy="joined", foreign_keys=[from_user_id]
     )
 
@@ -87,7 +91,8 @@ class Conversation(db.Model, CRUDMixin):
         """Returns the last message object."""
         return self.messages[-1]
 
-    def save(self, message=None):
+    @override
+    def save(self, message: "Message | None" = None):
         """Saves a conversation and returns the saved conversation object.
 
         :param message: If given, it will also save the message for the
@@ -112,27 +117,30 @@ class Conversation(db.Model, CRUDMixin):
 class Message(db.Model, CRUDMixin):
     __tablename__ = "messages"
 
-    id = db.Column(db.Integer, primary_key=True)
-    conversation_id = db.Column(
-        db.Integer,
-        db.ForeignKey("conversations.id", ondelete="CASCADE"),
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    conversation_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("conversations.id", ondelete="CASCADE"),
         nullable=False,
     )
 
     # the user who wrote the message
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id", ondelete="SET NULL"),
+    user_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
     )
-    message = db.Column(db.Text, nullable=False)
-    date_created = db.Column(
+    message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    date_created: Mapped[datetime.datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
 
-    user = db.relationship("User", lazy="joined")
+    user = relationship("User", lazy="joined")
 
-    def save(self, conversation=None):
+    conversation = relationship("Conversation", back_populates="messages")
+
+    @override
+    def save(self, conversation: Conversation | None = None):
         """Saves a private message.
 
         :param conversation: The  conversation to which the message

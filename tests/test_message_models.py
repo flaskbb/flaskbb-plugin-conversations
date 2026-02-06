@@ -1,8 +1,8 @@
-from conversations.models import Conversation, Message
+from conversations.models import Message
 
 
 def test_conversation_save(conversation):
-    """ also tests message.save() since we must create a message to save """
+    """also tests message.save() since we must create a message to save"""
     message = Message(
         user_id=conversation.user_id,
         conversation_id=conversation.id,
