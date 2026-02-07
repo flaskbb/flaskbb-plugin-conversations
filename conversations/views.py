@@ -48,7 +48,7 @@ def check_message_box_space(redirect_to: str | None = None):
                         will redirect to the ``conversations_bp.inbox``
                         endpoint.
     """
-    if get_message_count(real(current_user)) >= flaskbb_config["MESSAGE_QUOTA"]:
+    if get_message_count(real(current_user).id) >= flaskbb_config["MESSAGE_QUOTA"]:
         flash(
             _(
                 "You cannot send any messages anymore because you have "
@@ -103,7 +103,7 @@ class ViewConversation(MethodView):
         )
         if conversation.unread:
             conversation.unread = False
-            invalidate_cache(real(current_user))
+            invalidate_cache(real(current_user).id)
             conversation.save()
 
         form = self.form()
@@ -134,7 +134,7 @@ class ViewConversation(MethodView):
             # save the message in the recievers conversation
             old_conv = conversation
             conversation = Conversation.get(
-                Conversation.user_id == current_user.id,
+                Conversation.user_id == to_user_id,
                 Conversation.shared_id == conversation.shared_id,
             )
 
@@ -145,13 +145,14 @@ class ViewConversation(MethodView):
                     subject=old_conv.subject,
                     from_user=real(current_user),
                     to_user=to_user,
-                    user_id=to_user_id,
+                    user_id=to_user.id,
                     shared_id=old_conv.shared_id,
                 )
                 conversation.save()
 
             form.save(conversation=conversation, user_id=current_user.id, unread=True)
-            invalidate_cache(conversation.to_user)
+            invalidate_cache(conversation.to_user_id)
+            invalidate_cache(real(current_user).id)
 
             return redirect(
                 url_for(
@@ -220,7 +221,8 @@ class NewConversation(MethodView):
                 unread=True,
                 shared_id=shared_id,
             )
-            invalidate_cache(to_user)
+            invalidate_cache(to_user.id)
+            invalidate_cache(real(current_user).id)
 
             flash(_("Message sent."), "success")
             return redirect(url_for("conversations_bp.sent"))
@@ -297,7 +299,8 @@ class EditConversation(MethodView):
                 conversation.to_user_id = to_user.id
                 conversation.date_created = time_utcnow()
                 conversation.save()
-                invalidate_cache(to_user)
+                invalidate_cache(to_user.id)
+                invalidate_cache(real(current_user).id)
 
                 flash(_("Message sent."), "success")
                 return redirect(url_for("conversations_bp.sent"))
@@ -362,6 +365,7 @@ class DeleteConversation(MethodView):
         ).first_or_404()
 
         conversation.delete()
+        invalidate_cache(real(current_user).id)
         return redirect(url_for("conversations_bp.trash"))
 
 

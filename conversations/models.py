@@ -20,7 +20,7 @@ from flaskbb.user.models import User
 from flaskbb.utils.database import CRUDMixin, UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
 from sqlalchemy import Boolean, ForeignKey, Integer, String, Text, Uuid
-from sqlalchemy.orm import Mapped, WriteOnlyMapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 logger = logging.getLogger(__name__)
 

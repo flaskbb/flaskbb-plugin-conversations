@@ -47,15 +47,15 @@ def flaskbb_load_blueprints(app: Flask):
 
 @hookimpl
 def flaskbb_current_user(app: Flask, user: User):
-    setattr(user, "message_count", get_message_count(user))
+    setattr(user, "message_count", get_message_count(user.id))
 
 
 @hookimpl
 def flaskbb_tpl_user_nav_loggedin_before():
     return render_template(
         "_inject_navlink.html",
-        unread_messages=get_latest_messages(real(current_user)),
-        unread_count=get_unread_count(real(current_user)),
+        unread_messages=get_latest_messages(real(current_user).id),
+        unread_count=get_unread_count(real(current_user).id),
     )
 
 
