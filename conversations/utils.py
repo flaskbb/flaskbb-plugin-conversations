@@ -59,7 +59,7 @@ def get_latest_messages(user_id: int | None):
         .order_by(Conversation.id.desc())
         .limit(MAX_LATEST_CONVERSATIONS)
     )
-    result = db.session.execute(stmt).scalars()
+    result = db.session.execute(stmt).scalars().unique()
     return list(result)
 
 
