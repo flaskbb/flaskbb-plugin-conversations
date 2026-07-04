@@ -3,10 +3,27 @@ Changelog
 
 Here you can see the full list of changes between each release.
 
-Version 2.0.0
+Version 2.0.2
 -------------
 
 Unreleased
+
+* Update SQLAlchemy queries
+
+
+Version 2.0.1
+-------------
+
+Released on February 7th, 2026
+
+* Fix cache invalidation
+* Fix querying new messages
+
+
+Version 2.0.0
+-------------
+
+Released on February 6th, 2026
 
 * Switch to pyproject.toml
 * Update SQLAlchemy to 2

@@ -78,18 +78,18 @@ class Inbox(MethodView):
     def get(self):
         page = request.args.get("page", 1, type=int)
         # the inbox will display both, the recieved and the sent messages
-        conversations = (
-            Conversation.query.filter(
+        stmt = (
+            select(Conversation)
+            .where(
                 Conversation.user_id == current_user.id,
-                Conversation.draft == False,
-                Conversation.trash == False,
+                Conversation.draft.is_(False),
+                Conversation.trash.is_(False),
             )
             .order_by(Conversation.date_modified.desc())
-            .paginate(
-                page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"], error_out=False
-            )
         )
-
+        conversations = db.paginate(
+            stmt, page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"], error_out=False
+        )
         return render_template("inbox.html", conversations=conversations)
 
 
@@ -347,9 +347,9 @@ class RestoreConversation(MethodView):
     decorators = [login_required]
 
     def post(self, conversation_id: int):
-        conversation = Conversation.query.filter_by(
-            id=conversation_id, user_id=current_user.id
-        ).first_or_404()
+        conversation = Conversation.get_or_404(
+            Conversation.id == conversation_id, Conversation.user_id == current_user.id
+        )
 
         conversation.trash = False
         conversation.save()
@@ -360,9 +360,9 @@ class DeleteConversation(MethodView):
     decorators = [login_required]
 
     def post(self, conversation_id: int):
-        conversation = Conversation.query.filter_by(
-            id=conversation_id, user_id=current_user.id
-        ).first_or_404()
+        conversation = Conversation.get_or_404(
+            Conversation.id == conversation_id, Conversation.user_id == current_user.id
+        )
 
         conversation.delete()
         invalidate_cache(real(current_user).id)

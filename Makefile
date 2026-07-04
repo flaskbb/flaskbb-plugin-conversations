@@ -36,7 +36,7 @@ dist:
 	uv build
 
 upload:dist
-	twine upload dist/* --skip-existing
+	twine upload dist/{*.tar.gz,*.whl} --skip-existing
 
 update-translations:
 	pybabel extract -F babel.cfg -k lazy_gettext -o conversations/translations/messages.pot .
