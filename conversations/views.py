@@ -48,7 +48,8 @@ def check_message_box_space(redirect_to: str | None = None):
                         will redirect to the ``conversations_bp.inbox``
                         endpoint.
     """
-    if get_message_count(real(current_user).id) >= flaskbb_config["MESSAGE_QUOTA"]:
+    quota = flaskbb_config["CONVERSATIONS_MESSAGE_QUOTA"]
+    if get_message_count(real(current_user).id) >= quota:
         flash(
             _(
                 "You cannot send any messages anymore because you have "

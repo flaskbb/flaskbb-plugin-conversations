@@ -13,6 +13,7 @@ import os
 
 from flask import Flask
 from flask_login import current_user
+from flaskbb.core.settings.definitions import IntSetting, SettingGroup
 from flaskbb.forum.models import Post
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import real, render_template
@@ -21,10 +22,27 @@ from pluggy import HookimplMarker
 from .utils import get_latest_messages, get_message_count, get_unread_count
 from .views import conversations_bp
 
-# Temp fix until https://github.com/flaskbb/flaskbb/pull/509 is merged
-SETTINGS = None
-
 hookimpl = HookimplMarker("flaskbb")
+
+SETTINGS = SettingGroup(
+    key="conversations",
+    name="Conversations Settings",
+    description="Settings for the conversations plugin.",
+    settings=(
+        IntSetting(
+            key="MESSAGE_QUOTA",
+            value=50,
+            min=0,
+            name="Private Message Quota",
+            description="The amount of messages a user can have.",
+        ),
+    ),
+)
+
+
+@hookimpl
+def flaskbb_load_setting_groups():
+    return SETTINGS
 
 
 # connect the hooks
