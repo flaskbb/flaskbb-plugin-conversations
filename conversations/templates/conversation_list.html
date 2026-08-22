@@ -8,7 +8,7 @@
 
             <div class="col-auto">
                 <span class="badge bg-info" title="The amount of all conversations" data-bs-toggle="tooltip">
-                    {{ current_user.message_count or 0 }}/{{ flaskbb_config["MESSAGE_QUOTA"] }}
+                    {{ current_user.message_count or 0 }}/{{ flaskbb_config["CONVERSATIONS_MESSAGE_QUOTA"] }}
                 </span>
             </div>
         </div>
