@@ -13,7 +13,7 @@ import os
 
 from flask import Flask
 from flask_login import current_user
-from flaskbb.core.settings.definitions import IntSetting, SettingGroup
+from flaskbb.settings.definitions import IntSetting, SettingGroup
 from flaskbb.forum.models import Post
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import real, render_template

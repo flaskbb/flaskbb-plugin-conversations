@@ -28,7 +28,7 @@ from flaskbb.utils.helpers import (
     render_template,
     time_utcnow,
 )
-from flaskbb.utils.settings import flaskbb_config
+from flaskbb.settings import flaskbb_config
 from sqlalchemy import not_, select
 
 from .forms import ConversationForm, MessageForm

@@ -8,7 +8,6 @@ Create Date: 2018-02-17 19:29:12.376395
 
 import flaskbb
 import sqlalchemy as sa
-import sqlalchemy_utils
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -29,11 +28,7 @@ def upgrade():
             sa.Column("user_id", sa.Integer(), nullable=False),
             sa.Column("from_user_id", sa.Integer(), nullable=True),
             sa.Column("to_user_id", sa.Integer(), nullable=True),
-            sa.Column(
-                "shared_id",
-                sqlalchemy_utils.types.uuid.UUIDType(binary=16),
-                nullable=False,
-            ),
+            sa.Column("shared_id", sa.Uuid(), nullable=False),
             sa.Column("subject", sa.String(length=255), nullable=True),
             sa.Column(
                 "date_created",

@@ -13,7 +13,7 @@ from alembic import op
 revision = "1785520254"
 down_revision = "1770409336"
 branch_labels = ()
-depends_on = None
+depends_on = "1783713047"
 
 
 def upgrade():

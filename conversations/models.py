@@ -17,7 +17,7 @@ from typing import override
 
 from flaskbb.extensions import db
 from flaskbb.user.models import User
-from flaskbb.utils.database import CRUDMixin, UTCDateTime
+from flaskbb.utils.database import BaseModel, UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
 from sqlalchemy import Boolean, ForeignKey, Integer, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -25,7 +25,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 logger = logging.getLogger(__name__)
 
 
-class Conversation(db.Model, CRUDMixin):
+class Conversation(BaseModel):
     __tablename__ = "conversations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -114,7 +114,7 @@ class Conversation(db.Model, CRUDMixin):
         return self
 
 
-class Message(db.Model, CRUDMixin):
+class Message(BaseModel):
     __tablename__ = "messages"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
