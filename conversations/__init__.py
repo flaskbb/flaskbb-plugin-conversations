@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 conversations
 ~~~~~~~~~~~~~
@@ -13,8 +12,8 @@ import os
 
 from flask import Flask
 from flask_login import current_user
-from flaskbb.settings.definitions import IntSetting, SettingGroup
 from flaskbb.forum.models import Post
+from flaskbb.settings.definitions import IntSetting, SettingGroup
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import real, render_template
 from pluggy import HookimplMarker
@@ -58,14 +57,12 @@ def flaskbb_load_translations():
 
 @hookimpl
 def flaskbb_load_blueprints(app: Flask):
-    app.register_blueprint(
-        conversations_bp, url_prefix="/conversations", template_dir="templates"
-    )
+    app.register_blueprint(conversations_bp, url_prefix="/conversations", template_dir="templates")
 
 
 @hookimpl
 def flaskbb_current_user(app: Flask, user: User):
-    setattr(user, "message_count", get_message_count(user.id))
+    user.message_count = get_message_count(user.id)
 
 
 @hookimpl

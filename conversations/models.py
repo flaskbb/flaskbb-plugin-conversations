@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 conversations.views
 ~~~~~~~~~~~~~~~~~~~
@@ -72,14 +71,10 @@ class Conversation(BaseModel):
     )
 
     # the user to whom the conversation is addressed
-    to_user: Mapped[User] = relationship(
-        "User", lazy="joined", foreign_keys=[to_user_id]
-    )
+    to_user: Mapped[User] = relationship("User", lazy="joined", foreign_keys=[to_user_id])
 
     # the user who sent the message
-    from_user: Mapped[User] = relationship(
-        "User", lazy="joined", foreign_keys=[from_user_id]
-    )
+    from_user: Mapped[User] = relationship("User", lazy="joined", foreign_keys=[from_user_id])
 
     @property
     def first_message(self):

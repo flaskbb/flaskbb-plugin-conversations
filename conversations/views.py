@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 conversations.views
 ~~~~~~~~~~~~~~~~~~~
@@ -15,11 +14,12 @@ import uuid
 from functools import wraps
 from typing import Any
 
-from flask import Blueprint, abort, flash, redirect, request, url_for
+from flask import abort, Blueprint, flash, redirect, request, url_for
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_required
 from flaskbb.extensions import db
+from flaskbb.settings import flaskbb_config
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import (
     format_quote,
@@ -28,7 +28,6 @@ from flaskbb.utils.helpers import (
     render_template,
     time_utcnow,
 )
-from flaskbb.settings import flaskbb_config
 from sqlalchemy import not_, select
 
 from .forms import ConversationForm, MessageForm
@@ -51,10 +50,7 @@ def check_message_box_space(redirect_to: str | None = None):
     quota = flaskbb_config["CONVERSATIONS_MESSAGE_QUOTA"]
     if get_message_count(real(current_user).id) >= quota:
         flash(
-            _(
-                "You cannot send any messages anymore because you have "
-                "reached your message limit."
-            ),
+            _("You cannot send any messages anymore because you have reached your message limit."),
             "danger",
         )
         return redirect(redirect_to or url_for("conversations_bp.inbox"))
@@ -108,9 +104,7 @@ class ViewConversation(MethodView):
             conversation.save()
 
         form = self.form()
-        return render_template(
-            "conversation.html", conversation=conversation, form=form
-        )
+        return render_template("conversation.html", conversation=conversation, form=form)
 
     @require_message_box_space
     def post(self, conversation_id: int):
@@ -162,9 +156,7 @@ class ViewConversation(MethodView):
                 )
             )
 
-        return render_template(
-            "conversation.html", conversation=conversation, form=form
-        )
+        return render_template("conversation.html", conversation=conversation, form=form)
 
 
 class NewConversation(MethodView):
@@ -174,9 +166,7 @@ class NewConversation(MethodView):
     def get(self):
         form = self.form()
         form.to_user.data = request.args.get("to_user")
-        return render_template(
-            "message_form.html", form=form, title=_("Compose Message")
-        )
+        return render_template("message_form.html", form=form, title=_("Compose Message"))
 
     def post(self):
         form = self.form()
@@ -228,9 +218,7 @@ class NewConversation(MethodView):
             flash(_("Message sent."), "success")
             return redirect(url_for("conversations_bp.sent"))
 
-        return render_template(
-            "message_form.html", form=form, title=_("Compose Message")
-        )
+        return render_template("message_form.html", form=form, title=_("Compose Message"))
 
 
 class EditConversation(MethodView):
@@ -419,9 +407,7 @@ class TrashedMessages(MethodView):
         page = request.args.get("page", 1, type=int)
         stmt = (
             select(Conversation)
-            .where(
-                Conversation.user_id == current_user.id, Conversation.trash.is_(True)
-            )
+            .where(Conversation.user_id == current_user.id, Conversation.trash.is_(True))
             .order_by(Conversation.date_modified.desc())
         )
         conversations = db.paginate(
@@ -435,9 +421,7 @@ register_view(
     routes=["/drafts"],
     view_func=DraftMessages.as_view("drafts"),
 )
-register_view(
-    conversations_bp, routes=["/", "/inbox"], view_func=Inbox.as_view("inbox")
-)
+register_view(conversations_bp, routes=["/", "/inbox"], view_func=Inbox.as_view("inbox"))
 register_view(
     conversations_bp,
     routes=["/<int:conversation_id>/delete"],
@@ -468,9 +452,7 @@ register_view(
     routes=["/message/<int:message_id>/raw"],
     view_func=RawMessage.as_view("raw_message"),
 )
-register_view(
-    conversations_bp, routes=["/sent"], view_func=SentMessages.as_view("sent")
-)
+register_view(conversations_bp, routes=["/sent"], view_func=SentMessages.as_view("sent"))
 register_view(
     conversations_bp,
     routes=["/new"],
