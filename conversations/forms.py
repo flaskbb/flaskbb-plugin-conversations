@@ -16,6 +16,7 @@ from flask_babelplus import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from flaskbb.user.models import User
+from flaskbb.utils.helpers import real
 from wtforms import Field, StringField, SubmitField, TextAreaField, ValidationError
 from wtforms.validators import DataRequired
 
@@ -47,7 +48,7 @@ class ConversationForm(FlaskForm):
         user = User.get_by(username=field.data)
         if not user:
             raise ValidationError(_("The username you entered does not exist."))
-        if user.id == current_user.id:
+        if user.id == real(current_user).id:
             raise ValidationError(_("You cannot send a PM to yourself."))
 
     def save(

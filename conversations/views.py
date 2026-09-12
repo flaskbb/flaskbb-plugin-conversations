@@ -11,8 +11,8 @@ conversations Plugin.
 
 import logging
 import uuid
+from collections.abc import Callable
 from functools import wraps
-from typing import Any
 
 from flask import abort, Blueprint, flash, redirect, request, url_for
 from flask.views import MethodView
@@ -29,6 +29,7 @@ from flaskbb.utils.helpers import (
     time_utcnow,
 )
 from sqlalchemy import not_, select
+from werkzeug.wrappers import Response
 
 from .forms import ConversationForm, MessageForm
 from .models import Conversation, Message
@@ -56,13 +57,11 @@ def check_message_box_space(redirect_to: str | None = None):
         return redirect(redirect_to or url_for("conversations_bp.inbox"))
 
 
-def require_message_box_space(f):
+def require_message_box_space[**P, R](f: Callable[P, R]) -> Callable[P, R | Response]:
     """Decorator for :func:`check_message_box_space`."""
 
-    # not sure how this can be done without explicitly providing a decorator
-    # for this
     @wraps(f)
-    def wrapper(*a: Any, **k: Any):
+    def wrapper(*a: P.args, **k: P.kwargs) -> R | Response:
         return check_message_box_space() or f(*a, **k)
 
     return wrapper
@@ -77,7 +76,7 @@ class Inbox(MethodView):
         stmt = (
             select(Conversation)
             .where(
-                Conversation.user_id == current_user.id,
+                Conversation.user_id == real(current_user).id,
                 Conversation.draft.is_(False),
                 Conversation.trash.is_(False),
             )
@@ -95,7 +94,7 @@ class ViewConversation(MethodView):
 
     def get(self, conversation_id: int):
         conversation = Conversation.get_or_404(
-            Conversation.id == conversation_id, Conversation.user_id == current_user.id
+            Conversation.id == conversation_id, Conversation.user_id == real(current_user).id
         )
         if conversation.unread:
             conversation.unread = False
@@ -108,7 +107,7 @@ class ViewConversation(MethodView):
     @require_message_box_space
     def post(self, conversation_id: int):
         conversation = Conversation.get_or_404(
-            Conversation.id == conversation_id, Conversation.user_id == current_user.id
+            Conversation.id == conversation_id, Conversation.user_id == real(current_user).id
         )
 
         form = self.form()
@@ -116,14 +115,14 @@ class ViewConversation(MethodView):
             to_user_id = None
             # If the current_user is the user who recieved the message
             # then we have to change the id's a bit.
-            if current_user.id == conversation.to_user_id:
+            if real(current_user).id == conversation.to_user_id:
                 to_user_id = conversation.from_user_id
                 to_user = conversation.from_user
             else:
                 to_user_id = conversation.to_user_id
                 to_user = conversation.to_user
 
-            form.save(conversation=conversation, user_id=current_user.id)
+            form.save(conversation=conversation, user_id=real(current_user).id)
 
             # save the message in the recievers conversation
             old_conv = conversation
@@ -144,7 +143,7 @@ class ViewConversation(MethodView):
                 )
                 conversation.save()
 
-            form.save(conversation=conversation, user_id=current_user.id, unread=True)
+            form.save(conversation=conversation, user_id=real(current_user).id, unread=True)
             invalidate_cache(conversation.to_user_id)
             invalidate_cache(real(current_user).id)
 
@@ -175,9 +174,9 @@ class NewConversation(MethodView):
             shared_id = uuid.uuid4()
 
             form.save(
-                from_user=current_user.id,
+                from_user=real(current_user).id,
                 to_user=to_user.id,
-                user_id=current_user.id,
+                user_id=real(current_user).id,
                 unread=False,
                 as_draft=True,
                 shared_id=shared_id,
@@ -196,16 +195,16 @@ class NewConversation(MethodView):
 
             # Save the message in the current users inbox
             form.save(
-                from_user=current_user.id,
+                from_user=real(current_user).id,
                 to_user=to_user.id,
-                user_id=current_user.id,
+                user_id=real(current_user).id,
                 unread=False,
                 shared_id=shared_id,
             )
 
             # Save the message in the recievers inbox
             form.save(
-                from_user=current_user.id,
+                from_user=real(current_user).id,
                 to_user=to_user.id,
                 user_id=to_user.id,
                 unread=True,
@@ -244,7 +243,7 @@ class EditConversation(MethodView):
     def post(self, conversation_id: int):
         conversation = Conversation.get_or_404(
             Conversation.id == conversation_id,
-            Conversation.user_id == current_user.id,
+            Conversation.user_id == real(current_user).id,
         )
 
         if not conversation.draft:
@@ -275,7 +274,7 @@ class EditConversation(MethodView):
                 to_user = User.get_by_or_404(username=form.to_user.data)
                 # Save the message in the recievers inbox
                 form.save(
-                    from_user=current_user.id,
+                    from_user=real(current_user).id,
                     to_user=to_user.id,
                     user_id=to_user.id,
                     unread=True,
@@ -309,12 +308,12 @@ class RawMessage(MethodView):
         # abort if the message was not the current_user's one or the one of the
         # recieved ones
         if not (
-            message.conversation.from_user_id == current_user.id
-            or message.conversation.to_user_id == current_user.id
+            message.conversation.from_user_id == real(current_user).id
+            or message.conversation.to_user_id == real(current_user).id
         ):
             abort(404)
 
-        return format_quote(username=message.user.username, content=message.message)
+        return format_quote(username=message.user.username, content=message.message or "")
 
 
 class MoveConversation(MethodView):
@@ -322,7 +321,7 @@ class MoveConversation(MethodView):
 
     def post(self, conversation_id: int):
         conversation = Conversation.get_or_404(
-            Conversation.id == conversation_id, Conversation.user_id == current_user.id
+            Conversation.id == conversation_id, Conversation.user_id == real(current_user).id
         )
 
         conversation.trash = True
@@ -336,7 +335,7 @@ class RestoreConversation(MethodView):
 
     def post(self, conversation_id: int):
         conversation = Conversation.get_or_404(
-            Conversation.id == conversation_id, Conversation.user_id == current_user.id
+            Conversation.id == conversation_id, Conversation.user_id == real(current_user).id
         )
 
         conversation.trash = False
@@ -349,7 +348,7 @@ class DeleteConversation(MethodView):
 
     def post(self, conversation_id: int):
         conversation = Conversation.get_or_404(
-            Conversation.id == conversation_id, Conversation.user_id == current_user.id
+            Conversation.id == conversation_id, Conversation.user_id == real(current_user).id
         )
 
         conversation.delete()
@@ -366,10 +365,10 @@ class SentMessages(MethodView):
         stmt = (
             select(Conversation)
             .where(
-                Conversation.user_id == current_user.id,
+                Conversation.user_id == real(current_user).id,
                 Conversation.draft.is_(False),
                 Conversation.trash.is_(False),
-                not_(Conversation.to_user_id == current_user.id),
+                not_(Conversation.to_user_id == real(current_user).id),
             )
             .order_by(Conversation.date_modified.desc())
         )
@@ -387,7 +386,7 @@ class DraftMessages(MethodView):
         stmt = (
             select(Conversation)
             .where(
-                Conversation.user_id == current_user.id,
+                Conversation.user_id == real(current_user).id,
                 Conversation.draft.is_(True),
                 Conversation.trash.is_(False),
             )
@@ -406,7 +405,7 @@ class TrashedMessages(MethodView):
         page = request.args.get("page", 1, type=int)
         stmt = (
             select(Conversation)
-            .where(Conversation.user_id == current_user.id, Conversation.trash.is_(True))
+            .where(Conversation.user_id == real(current_user).id, Conversation.trash.is_(True))
             .order_by(Conversation.date_modified.desc())
         )
         conversations = db.paginate(

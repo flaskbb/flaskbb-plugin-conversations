@@ -9,6 +9,7 @@ A conversations Plugin for FlaskBB.
 """
 
 import os
+from typing import Any, cast
 
 from flask import Flask
 from flask_login import current_user
@@ -62,7 +63,7 @@ def flaskbb_load_blueprints(app: Flask):
 
 @hookimpl
 def flaskbb_current_user(app: Flask, user: User):
-    user.message_count = get_message_count(user.id)
+    cast(Any, user).message_count = get_message_count(user.id)
 
 
 @hookimpl
