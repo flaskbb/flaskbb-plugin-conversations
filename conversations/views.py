@@ -63,7 +63,6 @@ def require_message_box_space(f):
     # for this
     @wraps(f)
     def wrapper(*a: Any, **k: Any):
-        print("CALLED")
         return check_message_box_space() or f(*a, **k)
 
     return wrapper
