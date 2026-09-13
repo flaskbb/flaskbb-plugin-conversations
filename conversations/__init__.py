@@ -69,7 +69,7 @@ def flaskbb_current_user(app: Flask, user: User):
 @hookimpl
 def flaskbb_tpl_user_nav_loggedin_before():
     return render_template(
-        "_inject_navlink.html",
+        "conversations/_inject_navlink.html",
         unread_messages=get_latest_messages(real(current_user).id),
         unread_count=get_unread_count(real(current_user).id),
     )
@@ -77,9 +77,9 @@ def flaskbb_tpl_user_nav_loggedin_before():
 
 @hookimpl(trylast=True)
 def flaskbb_tpl_profile_actions(user: User):
-    return render_template("_inject_new_message_button.html", user=user)
+    return render_template("conversations/_inject_new_message_button.html", user=user)
 
 
 @hookimpl(trylast=True)
 def flaskbb_tpl_post_author_info_after(user: User, post: Post):
-    return render_template("_inject_new_message_link.html", user=user, post=post)
+    return render_template("conversations/_inject_new_message_link.html", user=user, post=post)

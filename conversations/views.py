@@ -85,7 +85,7 @@ class Inbox(MethodView):
         conversations = db.paginate(
             stmt, page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"], error_out=False
         )
-        return render_template("inbox.html", conversations=conversations)
+        return render_template("conversations/inbox.html", conversations=conversations)
 
 
 class ViewConversation(MethodView):
@@ -102,7 +102,9 @@ class ViewConversation(MethodView):
             conversation.save()
 
         form = self.form()
-        return render_template("conversation.html", conversation=conversation, form=form)
+        return render_template(
+            "conversations/conversation.html", conversation=conversation, form=form
+        )
 
     @require_message_box_space
     def post(self, conversation_id: int):
@@ -154,7 +156,9 @@ class ViewConversation(MethodView):
                 )
             )
 
-        return render_template("conversation.html", conversation=conversation, form=form)
+        return render_template(
+            "conversations/conversation.html", conversation=conversation, form=form
+        )
 
 
 class NewConversation(MethodView):
@@ -164,7 +168,9 @@ class NewConversation(MethodView):
     def get(self):
         form = self.form()
         form.to_user.data = request.args.get("to_user")
-        return render_template("message_form.html", form=form, title=_("Compose Message"))
+        return render_template(
+            "conversations/message_form.html", form=form, title=_("Compose Message")
+        )
 
     def post(self):
         form = self.form()
@@ -216,7 +222,9 @@ class NewConversation(MethodView):
             flash(_("Message sent."), "success")
             return redirect(url_for("conversations_bp.sent"))
 
-        return render_template("message_form.html", form=form, title=_("Compose Message"))
+        return render_template(
+            "conversations/message_form.html", form=form, title=_("Compose Message")
+        )
 
 
 class EditConversation(MethodView):
@@ -238,7 +246,9 @@ class EditConversation(MethodView):
         form.subject.data = conversation.subject
         form.message.data = conversation.first_message.message
 
-        return render_template("message_form.html", form=form, title=_("Edit Message"))
+        return render_template(
+            "conversations/message_form.html", form=form, title=_("Edit Message")
+        )
 
     def post(self, conversation_id: int):
         conversation = Conversation.get_or_404(
@@ -296,7 +306,9 @@ class EditConversation(MethodView):
             form.subject.data = conversation.subject
             form.message.data = conversation.first_message.message
 
-        return render_template("message_form.html", form=form, title=_("Edit Message"))
+        return render_template(
+            "conversations/message_form.html", form=form, title=_("Edit Message")
+        )
 
 
 class RawMessage(MethodView):
@@ -375,7 +387,7 @@ class SentMessages(MethodView):
         conversations = db.paginate(
             stmt, page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"], error_out=False
         )
-        return render_template("sent.html", conversations=conversations)
+        return render_template("conversations/sent.html", conversations=conversations)
 
 
 class DraftMessages(MethodView):
@@ -395,7 +407,7 @@ class DraftMessages(MethodView):
         conversations = db.paginate(
             stmt, page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"], error_out=False
         )
-        return render_template("drafts.html", conversations=conversations)
+        return render_template("conversations/drafts.html", conversations=conversations)
 
 
 class TrashedMessages(MethodView):
@@ -411,7 +423,7 @@ class TrashedMessages(MethodView):
         conversations = db.paginate(
             stmt, page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"], error_out=False
         )
-        return render_template("trash.html", conversations=conversations)
+        return render_template("conversations/trash.html", conversations=conversations)
 
 
 register_view(
