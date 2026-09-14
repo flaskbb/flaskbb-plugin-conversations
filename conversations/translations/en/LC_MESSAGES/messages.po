@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-06 20:27+0100\n"
+"POT-Creation-Date: 2026-09-14 21:28+0200\n"
 "PO-Revision-Date: 2018-02-23 13:30+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,164 +18,168 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: conversations/forms.py:29
+#: conversations/forms.py:30
 msgid "Recipient"
 msgstr ""
 
-#: conversations/forms.py:30
+#: conversations/forms.py:31
 msgid "A valid username is required."
 msgstr ""
 
-#: conversations/forms.py:34
+#: conversations/forms.py:35
 msgid "Subject"
 msgstr ""
 
-#: conversations/forms.py:35
+#: conversations/forms.py:36
 msgid "A Subject is required."
 msgstr ""
 
-#: conversations/forms.py:39 conversations/forms.py:77
-#: conversations/templates/_inject_new_message_button.html:3
-#: conversations/templates/_inject_new_message_link.html:3
-#: conversations/templates/conversation.html:93
+#: conversations/forms.py:40 conversations/forms.py:78
+#: conversations/templates/conversations/_inject_new_message_button.html:3
+#: conversations/templates/conversations/_inject_new_message_link.html:3
+#: conversations/templates/conversations/conversation.html:93
 msgid "Message"
 msgstr ""
 
-#: conversations/forms.py:40 conversations/forms.py:78
+#: conversations/forms.py:41 conversations/forms.py:79
 msgid "A message is required."
 msgstr ""
 
-#: conversations/forms.py:43
+#: conversations/forms.py:44
 msgid "Start Conversation"
 msgstr ""
 
-#: conversations/forms.py:44
+#: conversations/forms.py:45
 msgid "Save Conversation"
 msgstr ""
 
-#: conversations/forms.py:49
+#: conversations/forms.py:50
 msgid "The username you entered does not exist."
 msgstr ""
 
-#: conversations/forms.py:51
+#: conversations/forms.py:52
 msgid "You cannot send a PM to yourself."
 msgstr ""
 
-#: conversations/forms.py:80
+#: conversations/forms.py:81
 msgid "Send Message"
 msgstr ""
 
-#: conversations/views.py:55
+#: conversations/views.py:56
 msgid ""
 "You cannot send any messages anymore because you have reached your "
 "message limit."
 msgstr ""
 
-#: conversations/views.py:176 conversations/views.py:230
+#: conversations/views.py:174 conversations/views.py:230
 msgid "Compose Message"
 msgstr ""
 
-#: conversations/views.py:195 conversations/views.py:278
+#: conversations/views.py:193 conversations/views.py:282
 msgid "Message saved."
 msgstr ""
 
-#: conversations/views.py:226 conversations/views.py:303
+#: conversations/views.py:226 conversations/views.py:307
 msgid "Message sent."
 msgstr ""
 
-#: conversations/views.py:244 conversations/views.py:262
+#: conversations/views.py:245 conversations/views.py:264
 msgid "You cannot edit a sent message."
 msgstr ""
 
-#: conversations/views.py:253 conversations/views.py:311
+#: conversations/views.py:254 conversations/views.py:315
 msgid "Edit Message"
 msgstr ""
 
-#: conversations/templates/_inject_navlink.html:8
-#: conversations/templates/_inject_navlink.html:34
-#: conversations/templates/inbox.html:1
-#: conversations/templates/message_layout.html:18
+#: conversations/templates/conversations/_inject_navlink.html:8
+#: conversations/templates/conversations/_inject_navlink.html:34
+#: conversations/templates/conversations/inbox.html:1
+#: conversations/templates/conversations/message_layout.html:18
 msgid "Inbox"
 msgstr ""
 
-#: conversations/templates/_inject_navlink.html:23
-#: conversations/templates/conversation.html:101
-#: conversations/templates/conversation_list.html:49
-#: conversations/templates/conversation_list.html:56
+#: conversations/templates/conversations/_inject_navlink.html:23
+#: conversations/templates/conversations/conversation.html:101
+#: conversations/templates/conversations/conversation_list.html:50
+#: conversations/templates/conversations/conversation_list.html:57
 msgid "Deleted User"
 msgstr ""
 
-#: conversations/templates/_inject_navlink.html:31
+#: conversations/templates/conversations/_inject_navlink.html:31
 msgid "No unread messages."
 msgstr ""
 
-#: conversations/templates/_inject_navlink.html:35
-#: conversations/templates/message_layout.html:16
+#: conversations/templates/conversations/_inject_navlink.html:35
+#: conversations/templates/conversations/message_layout.html:16
 msgid "New Message"
 msgstr ""
 
-#: conversations/templates/conversation.html:39
-#: conversations/templates/conversation.html:90
+#: conversations/templates/conversations/conversation.html:39
+#: conversations/templates/conversations/conversation.html:90
 msgid "Joined"
 msgstr ""
 
-#: conversations/templates/conversation.html:40
-#: conversations/templates/conversation.html:91
+#: conversations/templates/conversations/conversation.html:40
+#: conversations/templates/conversations/conversation.html:91
 msgid "Posts"
 msgstr ""
 
-#: conversations/templates/conversation.html:43
-#: conversations/templates/conversation.html:97
+#: conversations/templates/conversations/conversation.html:43
+#: conversations/templates/conversations/conversation.html:97
 msgid "Website"
 msgstr ""
 
-#: conversations/templates/conversation.html:102
+#: conversations/templates/conversations/conversation.html:102
 msgid "Guest"
 msgstr ""
 
-#: conversations/templates/conversation_list.html:6
+#: conversations/templates/conversations/conversation_list.html:7
 msgid "Conversations"
 msgstr ""
 
-#: conversations/templates/conversation_list.html:45
+#: conversations/templates/conversations/conversation_list.html:46
 msgid "From"
 msgstr ""
 
-#: conversations/templates/conversation_list.html:52
+#: conversations/templates/conversations/conversation_list.html:53
 msgid "to"
 msgstr ""
 
-#: conversations/templates/conversation_list.html:58
+#: conversations/templates/conversations/conversation_list.html:59
 msgid "on"
 msgstr ""
 
-#: conversations/templates/conversation_list.html:104
+#: conversations/templates/conversations/conversation_list.html:77
+msgid "Are you sure?"
+msgstr ""
+
+#: conversations/templates/conversations/conversation_list.html:105
 msgid "No conversations found."
 msgstr ""
 
-#: conversations/templates/drafts.html:1
-#: conversations/templates/message_layout.html:20
+#: conversations/templates/conversations/drafts.html:1
+#: conversations/templates/conversations/message_layout.html:20
 msgid "Drafts"
 msgstr ""
 
-#: conversations/templates/message_layout.html:6
+#: conversations/templates/conversations/message_layout.html:6
 msgid "Forum"
 msgstr ""
 
-#: conversations/templates/message_layout.html:8
+#: conversations/templates/conversations/message_layout.html:8
 msgid "Private Message"
 msgstr ""
 
-#: conversations/templates/message_layout.html:19
+#: conversations/templates/conversations/message_layout.html:19
 msgid "Sent"
 msgstr ""
 
-#: conversations/templates/message_layout.html:21
-#: conversations/templates/trash.html:1
+#: conversations/templates/conversations/message_layout.html:21
+#: conversations/templates/conversations/trash.html:1
 msgid "Trash"
 msgstr ""
 
-#: conversations/templates/sent.html:1
+#: conversations/templates/conversations/sent.html:1
 msgid "Sent Messages"
 msgstr ""
 
