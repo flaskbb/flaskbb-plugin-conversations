@@ -24,6 +24,8 @@ from flaskbb.user.models import User
 from flaskbb.utils.helpers import (
     format_quote,
     real,
+    redirect_or_reload,
+    redirect_url,
     register_view,
     render_template,
     time_utcnow,
@@ -54,7 +56,7 @@ def check_message_box_space(redirect_to: str | None = None):
             _("You cannot send any messages anymore because you have reached your message limit."),
             "danger",
         )
-        return redirect(redirect_to or url_for("conversations_bp.inbox"))
+        return redirect_or_reload(redirect_to or url_for("conversations_bp.inbox"))
 
 
 def require_message_box_space[**P, R](f: Callable[P, R]) -> Callable[P, R | Response]:
@@ -149,7 +151,7 @@ class ViewConversation(MethodView):
             invalidate_cache(conversation.to_user_id)
             invalidate_cache(real(current_user).id)
 
-            return redirect(
+            return redirect_or_reload(
                 url_for(
                     "conversations_bp.view_conversation",
                     conversation_id=old_conv.id,
@@ -192,7 +194,9 @@ class NewConversation(MethodView):
             return redirect(url_for("conversations_bp.drafts"))
 
         if "send_message" in request.form and form.validate():
-            check_message_box_space()
+            if quota_exceeded := check_message_box_space():
+                return quota_exceeded
+
             to_user = User.get_by_or_404(username=form.to_user.data)
 
             # this is the shared id between conversations because the messages
@@ -279,7 +283,8 @@ class EditConversation(MethodView):
                 return redirect(url_for("conversations_bp.drafts"))
 
             if "send_message" in request.form and form.validate():
-                check_message_box_space()
+                if quota_exceeded := check_message_box_space():
+                    return quota_exceeded
 
                 to_user = User.get_by_or_404(username=form.to_user.data)
                 # Save the message in the recievers inbox
@@ -339,7 +344,7 @@ class MoveConversation(MethodView):
         conversation.trash = True
         conversation.save()
 
-        return redirect(url_for("conversations_bp.inbox"))
+        return redirect_or_reload(redirect_url(url_for("conversations_bp.inbox")))
 
 
 class RestoreConversation(MethodView):
@@ -352,7 +357,7 @@ class RestoreConversation(MethodView):
 
         conversation.trash = False
         conversation.save()
-        return redirect(url_for("conversations_bp.trash"))
+        return redirect_or_reload(redirect_url(url_for("conversations_bp.trash")))
 
 
 class DeleteConversation(MethodView):
@@ -365,7 +370,7 @@ class DeleteConversation(MethodView):
 
         conversation.delete()
         invalidate_cache(real(current_user).id)
-        return redirect(url_for("conversations_bp.trash"))
+        return redirect_or_reload(redirect_url(url_for("conversations_bp.trash")))
 
 
 class SentMessages(MethodView):

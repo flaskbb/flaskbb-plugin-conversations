@@ -2,7 +2,7 @@
 {% if request.endpoint and request.endpoint.startswith("conversations_bp") %}active{% endif %}
 {%- endmacro -%}
 
-<ul class="navbar-nav me-2">
+<ul class="navbar-nav me-2" id="conversations-nav">
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle {{ is_active() }}" href="#" id="navbarConvDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <span class="fas fa-envelope fa-fw"></span> {% trans %}Inbox{% endtrans %}

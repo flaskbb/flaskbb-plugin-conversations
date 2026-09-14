@@ -61,7 +61,7 @@
                             {% if conversation.draft %}
                                 <p class="text-right"><a href="{{ url_for('conversations_bp.edit_conversation', conversation_id=conversation.id) }}" class="btn btn-primary btn-sm"><i class="fa fa-pencil"></i> edit</a></p>
                             {% else %}
-                                <p class="{% if current_user.id == message.user_id %}left{% else %}right{% endif %}"><a href="#" class="btn btn-outline-dark btn-sm reply-btn" data-message-id="{{ message.id }}"><i class="fa fa-reply"></i> reply</a></p>
+                                <p class="{% if current_user.id == message.user_id %}left{% else %}right{% endif %}"><a href="#" class="btn btn-outline-dark btn-sm reply-btn" data-raw-url="{{ url_for('conversations_bp.raw_message', message_id=message.id) }}"><i class="fa fa-reply"></i> reply</a></p>
                             {% endif %}
                             </div>
 
@@ -112,7 +112,7 @@
 
 {% if not conversation.draft and conversation.from_user != None and conversation.to_user != None %}
 {% from "_macros/form.html" import render_editor_field, render_submit_field %}
-<form action="#" method="post">
+<form method="post" action="{{ url_for('conversations_bp.view_conversation', conversation_id=conversation.id) }}" hx-post="{{ url_for('conversations_bp.view_conversation', conversation_id=conversation.id) }}" hx-target="#message-content" hx-select="#message-content" hx-swap="outerHTML" hx-select-oob="#flashed-messages">
     {{ form.hidden_tag() }}
     <div class="row pt-3">
         <div class="col-10 offset-2">

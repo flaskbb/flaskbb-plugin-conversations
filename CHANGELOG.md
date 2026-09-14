@@ -9,6 +9,8 @@ Version 2.0.2
 Unreleased
 
 * Update SQLAlchemy queries
+* Move, restore, delete and reply to conversations without a page reload (htmx)
+* Enforce the message quota when sending a new message or a draft
 
 
 Version 2.0.1

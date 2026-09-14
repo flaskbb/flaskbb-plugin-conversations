@@ -1,5 +1,6 @@
 {% from theme('_macros/pagination.html') import generate_obj_id %}
-<div class="card conversation mb-3">
+{# the actions refresh the list, the navbar's unread messages and the flashed messages #}
+<div class="card conversation mb-3" hx-target="#message-content" hx-select="#message-content" hx-swap="outerHTML" hx-select-oob="#flashed-messages,#conversations-nav">
     <div class="card-header conversation-header">
         <div class="row">
             <div class="col me-auto">
@@ -64,7 +65,7 @@
                 <!-- actions -->
                 <div class="conversation-actions">
                     {% if include_move %}
-                    <form class="d-inline" method="POST" action="{{ url_for('conversations_bp.move_conversation', conversation_id=conversation.id) }}">
+                    <form class="d-inline" method="POST" action="{{ url_for('conversations_bp.move_conversation', conversation_id=conversation.id) }}" hx-post="{{ url_for('conversations_bp.move_conversation', conversation_id=conversation.id) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button type="submit" class="btn btn-info btn-xs" title="Move to Trash" data-bs-toggle="tooltip">
                             <span class="fas fa-archive"></span>
@@ -73,7 +74,7 @@
                     {% endif %}
 
                     {% if include_delete %}
-                    <form class="d-inline" method="POST" action="{{ url_for('conversations_bp.delete_conversation', conversation_id=conversation.id) }}">
+                    <form class="d-inline" method="POST" action="{{ url_for('conversations_bp.delete_conversation', conversation_id=conversation.id) }}" hx-post="{{ url_for('conversations_bp.delete_conversation', conversation_id=conversation.id) }}" hx-confirm="{{ _('Are you sure?') }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button type="submit" class="btn btn-danger btn-xs" title="Delete this conversation" data-bs-toggle="tooltip">
                             <span class="fas fa-trash-alt"></span>
@@ -82,7 +83,7 @@
                     {% endif %}
 
                     {% if include_restore %}
-                    <form class="d-inline" method="POST" action="{{ url_for('conversations_bp.restore_conversation', conversation_id=conversation.id) }}">
+                    <form class="d-inline" method="POST" action="{{ url_for('conversations_bp.restore_conversation', conversation_id=conversation.id) }}" hx-post="{{ url_for('conversations_bp.restore_conversation', conversation_id=conversation.id) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button type="submit" class="btn btn-success btn-xs" title="Restore this conversation" data-bs-toggle="tooltip">
                             <span class="fas fa-undo"></span>

@@ -22,7 +22,8 @@
             </ul>
         </div><!--/.sidebar -->
     </div><!--/.col-sm-3 -->
-    <div class="col-sm-9 col-md-10">
+    {# replaced by the htmx requests of the conversation list and the reply form #}
+    <div class="col-sm-9 col-md-10" id="message-content">
         {% block message_content %}{% endblock %}
     </div><!--/.col-sm-9 -->
 </div><!--/.row -->
@@ -30,26 +31,25 @@
 
 {% block scripts %}
 <script>
-    // Reply conversation
-    document.querySelectorAll(".reply-btn").forEach((el) =>
-        el.addEventListener("click", (event) => {
-            event.preventDefault();
-            const messageId = event.target.dataset.messageId;
-            const url = `/conversations/message/${messageId}/raw`;
+    // Reply conversation. delegated, so it keeps working on the messages htmx
+    // swapped in after a reply was sent
+    document.addEventListener("click", (event) => {
+        const button = event.target.closest(".reply-btn");
+        if (!button) return;
+        event.preventDefault();
 
-            const editor = document.querySelector(".flaskbb-editor");
-            fetch(url)
-                .then((response) => response.text())
-                .then((data) => {
-                    editor.value = data;
-                    editor.selectionStart = editor.selectionEnd = editor.value.length;
-                    editor.scrollTop = editor.scrollHeight;
-                    window.location.href = "#content";
-                })
-                .catch((error) => {
-                    console.error("something bad happened", error);
-                });
-        })
-    );
+        const editor = document.querySelector(".flaskbb-editor");
+        fetch(button.dataset.rawUrl)
+            .then((response) => response.text())
+            .then((data) => {
+                editor.value = data;
+                editor.selectionStart = editor.selectionEnd = editor.value.length;
+                editor.scrollTop = editor.scrollHeight;
+                window.location.href = "#content";
+            })
+            .catch((error) => {
+                console.error("something bad happened", error);
+            });
+    });
 </script>
 {% endblock %}
