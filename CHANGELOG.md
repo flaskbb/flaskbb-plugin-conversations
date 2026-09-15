@@ -3,6 +3,13 @@ Changelog
 
 Here you can see the full list of changes between each release.
 
+Version 3.0.1
+-------------
+
+Unreleased
+
+* Fix upgrading 1.x conversations on MySQL and SQLite, whose ids were stored as binary UUIDs
+
 Version 2.0.2
 -------------
 
