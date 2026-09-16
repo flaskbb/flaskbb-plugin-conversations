@@ -8,6 +8,7 @@ Version 3.0.1
 
 Unreleased
 
+* Add a setting to disable the message quota, allowing unlimited messages
 * Fix upgrading 1.x conversations on MySQL and SQLite, whose ids were stored as binary UUIDs
 
 Version 2.0.2

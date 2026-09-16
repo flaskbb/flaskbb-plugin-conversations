@@ -14,7 +14,7 @@ from typing import Any, cast
 from flask import Flask
 from flask_login import current_user
 from flaskbb.forum.models import Post
-from flaskbb.settings.definitions import IntSetting, SettingGroup
+from flaskbb.settings.definitions import BoolSetting, IntSetting, SettingGroup
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import real, render_template
 from pluggy import HookimplMarker
@@ -29,6 +29,13 @@ SETTINGS = SettingGroup(
     name="Conversations Settings",
     description="Settings for the conversations plugin.",
     settings=(
+        BoolSetting(
+            key="MESSAGE_QUOTA_ENABLED",
+            value=True,
+            name="Enable Private Message Quota",
+            description="Limit the amount of messages a user can have. "
+            "If disabled, users can have unlimited messages.",
+        ),
         IntSetting(
             key="MESSAGE_QUOTA",
             value=50,

@@ -50,6 +50,10 @@ def check_message_box_space(redirect_to: str | None = None):
                         will redirect to the ``conversations_bp.inbox``
                         endpoint.
     """
+    # an unset value (settings not yet upgraded) keeps the quota enforced
+    if flaskbb_config["CONVERSATIONS_MESSAGE_QUOTA_ENABLED"] is False:
+        return None
+
     quota = flaskbb_config["CONVERSATIONS_MESSAGE_QUOTA"]
     if get_message_count(real(current_user).id) >= quota:
         flash(

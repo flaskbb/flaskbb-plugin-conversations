@@ -63,7 +63,11 @@ def test_delete_returns_to_the_page_it_was_sent_from(application, conversation, 
 
 
 def test_reply_over_the_quota_loads_the_inbox(application, conversation, user, monkeypatch):
-    monkeypatch.setattr(views, "flaskbb_config", {"CONVERSATIONS_MESSAGE_QUOTA": 0})
+    monkeypatch.setattr(
+        views,
+        "flaskbb_config",
+        {"CONVERSATIONS_MESSAGE_QUOTA_ENABLED": True, "CONVERSATIONS_MESSAGE_QUOTA": 0},
+    )
 
     response, messages = _htmx_post(
         application,
@@ -113,7 +117,11 @@ def no_csrf(application):
 
 @pytest.fixture
 def no_quota(monkeypatch):
-    monkeypatch.setattr(views, "flaskbb_config", {"CONVERSATIONS_MESSAGE_QUOTA": 0})
+    monkeypatch.setattr(
+        views,
+        "flaskbb_config",
+        {"CONVERSATIONS_MESSAGE_QUOTA_ENABLED": True, "CONVERSATIONS_MESSAGE_QUOTA": 0},
+    )
 
 
 def _send(application, view, actor, recipient, **kwargs):
@@ -164,3 +172,20 @@ def test_draft_over_the_quota_is_not_sent(
     assert conversation_msgs.draft
     # sending would have put a copy into the recipient's inbox
     assert Conversation.count() == 1
+
+
+def test_disabled_quota_allows_sending_over_the_limit(
+    application, default_settings, no_csrf, user, admin_user, monkeypatch
+):
+    monkeypatch.setattr(
+        views,
+        "flaskbb_config",
+        {"CONVERSATIONS_MESSAGE_QUOTA_ENABLED": False, "CONVERSATIONS_MESSAGE_QUOTA": 0},
+    )
+
+    _response, messages = _send(
+        application, views.NewConversation.as_view("new_conversation"), user, admin_user
+    )
+
+    assert QUOTA_EXCEEDED not in messages
+    assert Conversation.count() == 2
