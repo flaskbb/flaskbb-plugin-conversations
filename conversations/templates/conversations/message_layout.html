@@ -40,15 +40,16 @@
 
         const editor = document.querySelector(".flaskbb-editor");
         fetch(button.dataset.rawUrl)
-            .then((response) => response.text())
-            .then((data) => {
-                editor.value = data;
-                editor.selectionStart = editor.selectionEnd = editor.value.length;
-                editor.scrollTop = editor.scrollHeight;
-                window.location.href = "#content";
+            .then((response) => {
+                // an expired session redirects to the login page
+                if (response.redirected || !response.ok) {
+                    throw new Error(`could not load ${button.dataset.rawUrl}`);
+                }
+                return response.text();
             })
+            .then((quote) => window.app.insertQuote(editor, quote))
             .catch((error) => {
-                console.error("something bad happened", error);
+                console.error("could not quote the message", error);
             });
     });
 </script>

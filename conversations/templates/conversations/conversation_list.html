@@ -21,7 +21,7 @@
             <!-- avatar -->
             <div class="col-md-1 col-sm-2 col-2 conversation-avatar">
                 {% if conversation.from_user and conversation.from_user.avatar %}
-                <img src="{{ conversation.from_user.avatar }}" class="rounded" alt="avatar" width="65px" height="65px" />
+                <img src="{{ conversation.from_user.avatar_url }}" class="rounded" alt="avatar" width="65px" height="65px" />
                 {% else %}
                 <img src="{{ url_for('static', filename='avatar80x80.png') }}" class="rounded" alt="avatar" width="65px" height="65px" />
                 {% endif %}

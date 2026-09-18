@@ -12,6 +12,7 @@ from flask_login import login_user, logout_user
 from flaskbb.extensions import db
 
 from conversations import views
+from conversations.forms import ConversationForm
 from conversations.models import Conversation
 
 
@@ -189,3 +190,11 @@ def test_disabled_quota_allows_sending_over_the_limit(
 
     assert QUOTA_EXCEEDED not in messages
     assert Conversation.count() == 2
+
+
+def test_recipient_field_opts_into_the_user_lookup(application):
+    with application.test_request_context():
+        field = ConversationForm(meta={"csrf": False}).to_user()
+
+    assert "data-user-lookup" in field
+    assert 'autocomplete="off"' in field

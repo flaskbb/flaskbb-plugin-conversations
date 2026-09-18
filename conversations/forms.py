@@ -29,6 +29,7 @@ class ConversationForm(FlaskForm):
     to_user = StringField(
         _("Recipient"),
         validators=[DataRequired(message=_("A valid username is required."))],
+        render_kw={"data-user-lookup": "", "autocomplete": "off"},
     )
 
     subject = StringField(
