@@ -3,10 +3,19 @@ Changelog
 
 Here you can see the full list of changes between each release.
 
+Version 3.0.2
+-------------
+
+Released on September 18th, 2026
+
+* Replying to a message adds the quote to the reply instead of replacing it
+* The recipient field suggests usernames after three characters
+
+
 Version 3.0.1
 -------------
 
-Unreleased
+Released on September 15th, 2026
 
 * Add a setting to disable the message quota, allowing unlimited messages
 * Fix upgrading 1.x conversations on MySQL and SQLite, whose ids were stored as binary UUIDs
