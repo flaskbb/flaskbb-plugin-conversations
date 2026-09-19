@@ -3,6 +3,14 @@ Changelog
 
 Here you can see the full list of changes between each release.
 
+Version 3.0.3
+-------------
+
+Released on September 19th, 2026
+
+* Fix styling in mobile and desktop version
+
+
 Version 3.0.2
 -------------
 
