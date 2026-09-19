@@ -7,7 +7,7 @@
         <a class="nav-link dropdown-toggle {{ is_active() }}" href="#" id="navbarConvDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <span class="fas fa-envelope fa-fw"></span> {% trans %}Inbox{% endtrans %}
             {%- if unread_count > 0 -%}
-            <span class="badge bg-danger">{{ unread_count }}</span>
+            <span class="badge bg-danger ms-1">{{ unread_count }}</span>
             {%- else -%}
             {#<span class="badge bg-secondary text-dark">{{ unread_count }}</span>#}
             {%- endif -%}

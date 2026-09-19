@@ -9,11 +9,11 @@
 </ol>
 
 <div class="row">
-    <div class="col-sm-3 col-md-2">
+    <div class="col-sm-3 col-xl-2">
         <div class="sidebar">
             <ul class="nav sidenav">
-                <div class="sidenav-btn">
-                    <a href="{{ url_for('conversations_bp.new_conversation') }}" class="btn btn-success">{% trans %}New Message{% endtrans %}</a>
+                <div class="sidenav-btn px-3">
+                    <a href="{{ url_for('conversations_bp.new_conversation') }}" class="btn btn-success w-100">{% trans %}New Message{% endtrans %}</a>
                 </div>
                 {{ navlink('conversations_bp.inbox', _('Inbox')) }}
                 {{ navlink('conversations_bp.sent', _('Sent')) }}
@@ -23,7 +23,7 @@
         </div><!--/.sidebar -->
     </div><!--/.col-sm-3 -->
     {# replaced by the htmx requests of the conversation list and the reply form #}
-    <div class="col-sm-9 col-md-10" id="message-content">
+    <div class="col-sm-9 col-xl-10" id="message-content">
         {% block message_content %}{% endblock %}
     </div><!--/.col-sm-9 -->
 </div><!--/.row -->

@@ -19,7 +19,7 @@
         {% for conversation in conversations.items %}
         <div class="row conversation-row hover {% if conversation.unread %}unread{% endif %}">
             <!-- avatar -->
-            <div class="col-md-1 col-sm-2 col-2 conversation-avatar">
+            <div class="col-auto conversation-avatar">
                 {% if conversation.from_user and conversation.from_user.avatar %}
                 <img src="{{ conversation.from_user.avatar_url }}" class="rounded" alt="avatar" width="65px" height="65px" />
                 {% else %}
@@ -27,7 +27,7 @@
                 {% endif %}
             </div>
             <!-- other stuff -->
-            <div class="col-md-11 col-sm-10 col-10 conversation-info">
+            <div class="col conversation-info">
                 <!-- subject -->
                 <div class="conversation-subject">
                     <a href="{{ url_for('conversations_bp.view_conversation', conversation_id=conversation.id) }}">
