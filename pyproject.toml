@@ -1,6 +1,6 @@
 [project]
 name = "flaskbb-plugin-conversations"
-version = "3.0.4"
+version = "3.0.5"
 dependencies = [
     "FlaskBB>=3.0.0rc1",
 ]
