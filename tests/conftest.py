@@ -7,6 +7,11 @@ from tests.fixtures.user import *
 from conversations.models import Conversation, Message
 
 
+@pytest.fixture(scope="package")
+def tested_plugins():
+    return ["conversations"]
+
+
 @pytest.fixture
 def conversation(database, user, admin_user):
     conversation = Conversation(
