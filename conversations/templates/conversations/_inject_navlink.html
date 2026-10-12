@@ -17,12 +17,12 @@
             <li>
                 <a class="dropdown-item" href="{{ url_for('conversations_bp.view_conversation', conversation_id=message.id) }}">
                     <div>
-                        {% if message.from_user %}
-                            <span class="author-name">{{ message.from_user.username }}</span>
+                        {% if message.from_username %}
+                            <span class="author-name">{{ message.from_username }}</span>
                         {% else %}
                             {% trans %}Deleted User{% endtrans %}
                         {% endif %}
-                        <span class="pull-right text-muted">{{ message.last_message.date_created|time_since }}</span>
+                        <span class="pull-right text-muted">{{ message.last_message_at|time_since }}</span>
                         <div class="message-subject">{{ message.subject }}</div>
                     </div>
                 </a>
