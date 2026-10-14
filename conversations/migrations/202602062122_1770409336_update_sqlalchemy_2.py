@@ -65,12 +65,14 @@ def downgrade():
     with op.batch_alter_table("messages", schema=None) as batch_op:
         batch_op.alter_column("message", existing_type=sa.TEXT(), nullable=False)
 
-    with op.batch_alter_table("conversations", schema=None) as batch_op:
-        batch_op.alter_column(
-            "shared_id",
-            existing_type=sa.Uuid(),
-            type_=sa.NUMERIC(precision=16),
-            existing_nullable=False,
-        )
+    # PostgreSQL stored a native uuid before this revision too, it can't be cast to NUMERIC
+    if op.get_bind().dialect.name != "postgresql":
+        with op.batch_alter_table("conversations", schema=None) as batch_op:
+            batch_op.alter_column(
+                "shared_id",
+                existing_type=sa.Uuid(),
+                type_=sa.NUMERIC(precision=16),
+                existing_nullable=False,
+            )
 
     # ### end Alembic commands ###

@@ -152,7 +152,7 @@ class ViewConversation(MethodView):
                 conversation.save()
 
             form.save(conversation=conversation, user_id=real(current_user).id, unread=True)
-            invalidate_cache(conversation.to_user_id)
+            invalidate_cache(to_user_id)
             invalidate_cache(real(current_user).id)
 
             return redirect_or_reload(

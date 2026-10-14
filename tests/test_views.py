@@ -6,6 +6,8 @@ blueprint's before-request handlers - they are orthogonal to what is tested
 here.
 """
 
+import uuid
+
 import pytest
 from flask import get_flashed_messages, url_for
 from flask_login import login_user, logout_user
@@ -14,6 +16,7 @@ from flaskbb.extensions import db
 from conversations import views
 from conversations.forms import ConversationForm
 from conversations.models import Conversation
+from conversations.utils import get_unread_count
 
 
 def _htmx_post(application, view, actor, current_url, **kwargs):
@@ -198,3 +201,23 @@ def test_recipient_field_opts_into_the_user_lookup(application):
 
     assert "data-user-lookup" in field
     assert 'autocomplete="off"' in field
+
+
+def test_reply_refreshes_the_unread_count_of_the_conversation_starter(
+    application, default_settings, no_csrf, user, admin_user, monkeypatch
+):
+    monkeypatch.setattr(views, "flaskbb_config", {"CONVERSATIONS_MESSAGE_QUOTA_ENABLED": False})
+    shared_id = uuid.uuid4()
+    for owner in (user, admin_user):
+        Conversation(
+            user_id=owner.id, from_user_id=user.id, to_user_id=admin_user.id, shared_id=shared_id
+        ).save()
+    received = Conversation.get(Conversation.user_id == admin_user.id)
+    assert get_unread_count(user.id) == 0
+
+    with application.test_request_context(method="POST", data={"message": "A reply"}):
+        login_user(admin_user)
+        views.ViewConversation.as_view("view_conversation")(conversation_id=received.id)
+        logout_user()
+
+    assert get_unread_count(user.id) == 1
