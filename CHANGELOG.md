@@ -6,7 +6,7 @@ Here you can see the full list of changes between each release.
 Version 3.0.6
 -------------
 
-Unreleased
+Released on October 14th, 2026
 
 * Fix uninstalling the plugin on PostgreSQL
 * The unread count of the user who started a conversation updates right away when a reply arrives

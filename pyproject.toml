@@ -1,8 +1,8 @@
 [project]
 name = "flaskbb-plugin-conversations"
-version = "3.0.5"
+version = "3.0.6"
 dependencies = [
-    "FlaskBB>=3.0.0rc1",
+    "FlaskBB>=3.0.0rc4",
 ]
 requires-python = ">=3.12"
 authors = [
