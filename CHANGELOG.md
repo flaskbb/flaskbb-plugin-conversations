@@ -3,6 +3,12 @@ Changelog
 
 Here you can see the full list of changes between each release.
 
+Version 3.0.7
+-------------
+
+Released on October 14th, 2026
+
+
 Version 3.0.6
 -------------
 
