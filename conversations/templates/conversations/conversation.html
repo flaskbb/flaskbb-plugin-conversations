@@ -42,9 +42,9 @@
 
                 <div class="message-actions">
                     {% if conversation.draft %}
-                    <a href="{{ url_for('conversations_bp.edit_conversation', conversation_id=conversation.id) }}" class="btn btn-primary btn-sm"><span class="fas fa-pen fa-fw"></span> {% trans %}Edit{% endtrans %}</a>
+                    <a href="{{ url_for('conversations_bp.edit_conversation', conversation_id=conversation.id) }}" class="btn btn-primary btn-sm"><span class="fas fa-pen"></span> {% trans %}Edit{% endtrans %}</a>
                     {% else %}
-                    <a href="#" class="btn btn-outline-secondary btn-sm reply-btn" data-raw-url="{{ url_for('conversations_bp.raw_message', message_id=message.id) }}"><span class="fas fa-reply fa-fw"></span> {% trans %}Quote{% endtrans %}</a>
+                    <a href="#" class="btn btn-outline-secondary btn-sm reply-btn" data-raw-url="{{ url_for('conversations_bp.raw_message', message_id=message.id) }}"><span class="fas fa-reply"></span> {% trans %}Quote{% endtrans %}</a>
                     {% endif %}
                 </div>
             </div>

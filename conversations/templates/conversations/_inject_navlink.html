@@ -5,7 +5,7 @@
 <ul class="navbar-nav me-2" id="conversations-nav">
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle {{ is_active() }}" href="#" id="navbarConvDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <span class="fas fa-envelope fa-fw"></span> {% trans %}Inbox{% endtrans %}
+            <span class="fas fa-envelope"></span> {% trans %}Inbox{% endtrans %}
             {%- if unread_count > 0 -%}
             <span class="badge bg-danger ms-1">{{ unread_count }}</span>
             {%- else -%}
@@ -31,8 +31,8 @@
             <li><div class="dropdown-item-text">{% trans %}No unread messages.{% endtrans %}</div></li>
             {% endfor %}
             <li class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{{ url_for('conversations_bp.inbox') }}"><span class="fas fa-envelope fa-fw"></span> {% trans %}Inbox{% endtrans %}</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('conversations_bp.new_conversation') }}"><span class="fas fa-pen fa-fw"></span> {% trans %}New Message{% endtrans %}</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('conversations_bp.inbox') }}"><span class="fas fa-envelope"></span> {% trans %}Inbox{% endtrans %}</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('conversations_bp.new_conversation') }}"><span class="fas fa-pen"></span> {% trans %}New Message{% endtrans %}</a></li>
         </ul>
     </li>
 </ul>
